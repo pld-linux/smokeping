@@ -2,7 +2,7 @@ Summary:	Smokeping - a traffic grapher that uses rrdtool
 Summary(pl):	Smokeping - narzêdzie do tworzenia wykresów aktywno¶ci sieci
 Name:		smokeping
 Version:	1.30
-Release:	0.1
+Release:	0.2
 Vendor:		Tobias Oetiker
 License:	GPL
 Group:		Networking/Utilities
@@ -60,18 +60,41 @@ install doc/*.1 $RPM_BUILD_ROOT%{_mandir}/man1
 rm -rf $RPM_BUILD_ROOT
 
 %post
-# TODO -> create /etc/smokeping/config
+firstgate=`route -n |awk '$1=="0.0.0.0" && $4 ~ /G/ {print $2}' |head -1`
+echo "
++ gateway
+ menu   = Default Gateway
+ title  = Default Gateway Router
+ host   = $firstgate
+
++ dns
+ menu   = DNS Servers
+ title  = Domain Name Servers
+        " >>%{_sysconfdir}/%{name}/config
+for dns in `awk '$1 ~ /^nameserver/ {print $2}' /etc/resolv.conf |sort -u` ; do
+((dnscnt++))
+echo "++ dns$dnscnt
+  menu  = DNS Server $dnscnt
+  title = Domain Name Server $dnscnt
+  host  = $dns
+        " >>%{_sysconfdir}/%{name}/config
+done
+
+[ "$HOSTNAME" ] && %{__perl} -pi -e "s|localhost|$HOSTNAME|g" %{_sysconfdir}/%{name}/config 
+
+
 /sbin/chkconfig --add %{name} 
+
 if [ -f /var/lock/subsys/%{name} ]; then
         /etc/rc.d/init.d/%{name} restart 1>&2
 else
         echo "Run \"/etc/rc.d/init.d/%{name} start\" to start smokeping."
 fi
 
-if ! grep -q "^Include.*/smokeping.conf" %{_wwwconfig}; then 
+if ! grep -q "^Include.*/%{name}.conf" %{_wwwconfig}; then 
 	echo >> %{_wwwconfig} 
 	echo "#added by SmokePing instalator" >> %{_wwwconfig} 
-	echo "Include %{_wwwconfdir}/smokeping.conf" >> %{_wwwconfig} 
+	echo "Include %{_wwwconfdir}/%{name}.conf" >> %{_wwwconfig} 
 	echo >> %{_wwwconfig} 
 fi 
 
@@ -80,11 +103,12 @@ if [ -f /var/lock/subsys/httpd ]; then
 fi
 
 %preun
-# TODO -> remove "Include %{_wwwconfdir}/smokeping.conf"
 if [ $1 = 0 ]; then
         if [ -f /var/lock/subsys/%{name} ]; then
                 /etc/rc.d/init.d/%{name} stop 1>&2
         fi
+
+	%{__perl} -pi -e 's/Include %{_wwwconfdir}/%{name}.conf\n//mg' %{_wwwconfig}
 
 	/sbin/chkconfig --del %{name} 
 
