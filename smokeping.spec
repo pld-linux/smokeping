@@ -13,6 +13,8 @@ Source2:	%{name}.conf
 Source3:	%{name}-config
 URL:		http://people.ee.ethz.ch/~oetiker/webtools/smokeping/
 BuildRequires:	perl-tools-pod
+PreReq:		rc-scripts
+Requires(post,preun):	/sbin/chkconfig
 Requires:	fping
 Requires:	perl-base
 Requires:	rrdtool
