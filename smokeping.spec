@@ -108,25 +108,25 @@ fi
 /sbin/chkconfig --add %{name} 
 
 if [ -f /var/lock/subsys/%{name} ]; then
-        /etc/rc.d/init.d/%{name} restart 1>&2
+	/etc/rc.d/init.d/%{name} restart 1>&2
 else
-        echo "Run \"/etc/rc.d/init.d/%{name} start\" to start smokeping."
+	echo "Run \"/etc/rc.d/init.d/%{name} start\" to start smokeping."
 fi
 
 if [ -f /var/lock/subsys/httpd ]; then
-        /etc/rc.d/init.d/httpd restart 1>&2
+	/etc/rc.d/init.d/httpd restart 1>&2
 fi
 
 %preun
 if [ $1 = 0 ]; then
-        if [ -f /var/lock/subsys/%{name} ]; then
-                /etc/rc.d/init.d/%{name} stop 1>&2
-        fi
+	if [ -f /var/lock/subsys/%{name} ]; then
+		/etc/rc.d/init.d/%{name} stop 1>&2
+	fi
 
 	/sbin/chkconfig --del %{name} 
 
 	if [ -f /var/lock/subsys/httpd ]; then
-        	/etc/rc.d/init.d/httpd restart 1>&2
+		/etc/rc.d/init.d/httpd restart 1>&2
 	fi
 fi
 
