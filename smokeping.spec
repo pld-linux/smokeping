@@ -10,7 +10,7 @@ Source0:	http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/%{name}-%{vers
 # Source0-md5:	b7e909fb4d851995edc05afffb1a1e4b
 Source1:	%{name}.init
 Source2:	%{name}.conf
-URL:		http://people.ee.ethz.ch/~oetiker/webtools/smokeping
+URL:		http://people.ee.ethz.ch/~oetiker/webtools/smokeping/
 BuildRequires:	perl-base
 Requires:	fping
 Requires:	perl-base
@@ -19,9 +19,9 @@ Requires:	webserver
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_wwwrootdir		/home/services/httpd
-%define		_wwwconfig		/etc/httpd/conf/httpd.conf
-%define         _wwwconfdir              /etc/httpd/conf
+%define		_wwwrootdir	/home/services/httpd
+%define		_wwwconfig	/etc/httpd/conf/httpd.conf
+%define		_wwwconfdir	/etc/httpd/conf
 
 %description
 SmokePing is a ICMP latency logging and graphing system. It consists
