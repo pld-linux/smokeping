@@ -21,6 +21,8 @@ BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %define		_wwwrootdir		/home/services/httpd
+%define		_wwwconfig		/etc/httpd/conf/httpd.conf
+%define         _wwwconfdir              /etc/httpd/conf
 
 %description
 SmokePing is a ICMP latency logging and graphing system. It consists
@@ -58,12 +60,41 @@ cp doc/*.1	$RPM_BUILD_ROOT/%{_mandir}/man1/
 rm -rf $RPM_BUILD_ROOT
 
 %post
-/sbin/chkconfig --add smokeping
+# TODO -> create /etc/smokeping/config
+/sbin/chkconfig --add %{name} 
+if [ -f /var/lock/subsys/%{name} ]; then
+        /etc/rc.d/init.d/%{name} restart 1>&2
+else
+        echo "Run \"/etc/rc.d/init.d/%{name} start\" to start smokeping."
+fi
+
+if ! grep -q "^Include.*/smokeping.conf" %{_wwwconfig}; then 
+	echo >> %{_wwwconfig} 
+	echo "#added by SmokePing instalator" >> %{_wwwconfig} 
+	echo "Include %{_wwwconfdir}/smokeping.conf" >> %{_wwwconfig} 
+	echo >> %{_wwwconfig} 
+fi 
+
+if [ -f /var/lock/subsys/httpd ]; then
+        /etc/rc.d/init.d/httpd restart 1>&2
+fi
+
 
 %preun
+# TODO -> remove "Include %{_wwwconfdir}/smokeping.conf"
 if [ $1 = 0 ]; then
-	/sbin/chkconfig --del smokeping
+        if [ -f /var/lock/subsys/%{name} ]; then
+                /etc/rc.d/init.d/%{name} stop 1>&2
+        fi
+
+	/sbin/chkconfig --del %{name} 
+
+	if [ -f /var/lock/subsys/httpd ]; then
+        	/etc/rc.d/init.d/httpd restart 1>&2
+	fi
 fi
+
+
 
 %files
 %defattr(644,root,root,755)
