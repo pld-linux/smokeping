@@ -3,7 +3,7 @@ Summary(pl):	Smokeping jest narzêdziem do tworzenia wykresów aktywno¶ci sieci.
 Name: 		smokeping
 Version: 	1.30
 Release: 	0.1	
-Source0: 	http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/%name-%version.tar.gz
+Source0: 	http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/%{name}-%{version}.tar.gz
 # Source0-md5:	b7e909fb4d851995edc05afffb1a1e4b
 Source1:	%name.init
 Source2:	%name.conf
