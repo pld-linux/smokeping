@@ -1,5 +1,5 @@
-Summary:	Smokeping is a traffic grapher that uses rrdtool
-Summary(pl):	Smokeping jest narzêdziem do tworzenia wykresów aktywno¶ci sieci
+Summary:	Smokeping - a traffic grapher that uses rrdtool
+Summary(pl):	Smokeping - narzêdzie do tworzenia wykresów aktywno¶ci sieci
 Name:		smokeping
 Version:	1.30
 Release:	0.1
@@ -41,19 +41,20 @@ i wy¶wietla je w postaci czytelnego wykresu.
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -D etc/basepage.html.dist $RPM_BUILD_ROOT/%{_sysconfdir}/%name/basepage.html
-install -D etc/config.dist $RPM_BUILD_ROOT/%{_sysconfdir}/%name/config
-install -D etc/config-echoping.dist $RPM_BUILD_ROOT/%{_sysconfdir}/%name/config-echoping
-install -D etc/smokemail.dist $RPM_BUILD_ROOT/%{_sysconfdir}/%name/smokemail
-install -D -m 755 bin/smokeping.dist $RPM_BUILD_ROOT/%{_bindir}/smokeping
-install -d $RPM_BUILD_ROOT/%{_libdir}/smokeping
-cp -r lib/* $RPM_BUILD_ROOT/%{_libdir}/smokeping/
-install -d $RPM_BUILD_ROOT/%{_wwwrootdir}/%{name}/{rrd,img}
-install -D -m755 htdocs/%{name}.cgi.dist	$RPM_BUILD_ROOT/%{_wwwrootdir}/cgi-bin/%{name}
-install -D -m 755 %{SOURCE1} $RPM_BUILD_ROOT/%{_sysconfdir}/init.d/%name
-install -D %{SOURCE2} $RPM_BUILD_ROOT/%{_sysconfdir}/httpd/conf.d/%{name}.conf
-install -d $RPM_BUILD_ROOT/%{_mandir}/man1/
-cp doc/*.1	$RPM_BUILD_ROOT/%{_mandir}/man1/
+
+install -D etc/basepage.html.dist $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/basepage.html
+install -D etc/config.dist $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/config
+install -D etc/config-echoping.dist $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/config-echoping
+install -D etc/smokemail.dist $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/smokemail
+install -D -m 755 bin/smokeping.dist $RPM_BUILD_ROOT%{_bindir}/smokeping
+install -d $RPM_BUILD_ROOT%{_libdir}/smokeping
+cp -r lib/* $RPM_BUILD_ROOT%{_libdir}/smokeping
+install -d $RPM_BUILD_ROOT%{_wwwrootdir}/%{name}/{rrd,img}
+install -D -m755 htdocs/%{name}.cgi.dist $RPM_BUILD_ROOT%{_wwwrootdir}/cgi-bin/%{name}
+install -D -m 755 %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
+install -D %{SOURCE2} $RPM_BUILD_ROOT%{_sysconfdir}/httpd/conf.d/%{name}.conf
+install -d $RPM_BUILD_ROOT%{_mandir}/man1
+install doc/*.1 $RPM_BUILD_ROOT%{_mandir}/man1
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -78,7 +79,6 @@ if [ -f /var/lock/subsys/httpd ]; then
         /etc/rc.d/init.d/httpd restart 1>&2
 fi
 
-
 %preun
 # TODO -> remove "Include %{_wwwconfdir}/smokeping.conf"
 if [ $1 = 0 ]; then
@@ -93,20 +93,20 @@ if [ $1 = 0 ]; then
 	fi
 fi
 
-
-
 %files
 %defattr(644,root,root,755)
 %doc CHANGES CONTRIBUTORS COPYRIGHT TODO README doc/*.txt doc/*.html
 %attr(755,root,root) %{_bindir}/*
-%{_libdir}/*/*
-%{_mandir}/*/*
-%config %{_sysconfdir}/%name/config
-%config %{_sysconfdir}/%name/config-echoping
-%config %{_sysconfdir}/%name/smokemail
-%config %{_sysconfdir}/%name/basepage.html
-%config %{_sysconfdir}/httpd/conf.d/%{name}.conf
-%attr(755,root,root) %{_sysconfdir}/init.d/%name
+%{_libdir}/smokeping
+%{_mandir}/man1/*.1*
+%dir %{_sysconfdir}/%{name}
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/config
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/config-echoping
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/smokemail
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/basepage.html
+%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/httpd/conf.d/%{name}.conf
+%attr(755,root,root) /etc/rc.d/init.d/%{name}
+%dir %{_wwwrootdir}/%{name}
 %dir %{_wwwrootdir}/%{name}/rrd
 %dir %{_wwwrootdir}/%{name}/img
 %{_wwwrootdir}/cgi-bin/%{name}
