@@ -5,8 +5,7 @@ Version:	1.30
 Release:	0.1
 Vendor:		Tobias Oetiker
 License:	GPL
-Group:		Applications/Internet
-######		Unknown group!
+Group:		Networking/Utilities
 Source0:	http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/%{name}-%{version}.tar.gz
 # Source0-md5:	b7e909fb4d851995edc05afffb1a1e4b
 Source1:	%{name}.init
