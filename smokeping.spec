@@ -1,13 +1,13 @@
 Summary:	Smokeping - a traffic grapher that uses rrdtool
 Summary(pl):	Smokeping - narzêdzie do tworzenia wykresów aktywno¶ci sieci
 Name:		smokeping
-Version:	1.30
-Release:	0.2
+Version:	1.31
+Release:	0.1
 Vendor:		Tobias Oetiker
 License:	GPL
 Group:		Networking/Utilities
 Source0:	http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/%{name}-%{version}.tar.gz
-# Source0-md5:	b7e909fb4d851995edc05afffb1a1e4b
+# Source0-md5:	1d175cdc39cdacaa7d81059501bdd725
 Source1:	%{name}.init
 Source2:	%{name}.conf
 URL:		http://people.ee.ethz.ch/~oetiker/webtools/smokeping/
