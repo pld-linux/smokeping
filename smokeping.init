@@ -1,59 +1,60 @@
 #! /bin/sh
 #
-# chkconfig: 345 70 30
+# smokeping:	Controls the smokeping daemon.
+#
+# chkconfig:	345 70 30
 # description:	latency logging and graphing system
-# processname: smokeping
+# processname:	smokeping
 
-# Source function library.
-. /etc/init.d/functions
+# Source function library
+. /etc/rc.d/init.d/functions
 
-# Get config.
+# Get network config
 . /etc/sysconfig/network
 
 # Check that networking is up.
-if [ "$NETWORKING" = "no" ]
-then
+if is_yes "${NETWORKING}"; then
+	if [ ! -f /var/lock/subsys/network -a "$1" != stop -a "$1" != status ]; then
+		msg_network_down smokeping
+		exit 1
+	fi
+else
 	exit 0
 fi
 
 RETVAL=0
-prog='smokeping'
-
-start() {
-	echo -n $"Starting $prog: "
-	daemon $prog
-	RETVAL=$?
-	echo
-	[ $RETVAL -eq 0 ] && touch /var/lock/subsys/$prog
-}
-stop() {
-	echo -n $"Stopping $prog: "
-	killproc $prog
-	RETVAL=$?
-	echo
-	[ $RETVAL -eq 0 ] && rm -f /var/lock/subsys/$prog
-}
-# See how we were called.
 case "$1" in
   start)
-	start
+	if [ ! -f /var/lock/subsys/smokeping ]; then
+		msg_starting smokeping
+		daemon smokeping
+		RETVAL=$?
+		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/smokeping
+	else
+		msg_already_running smokeping
+	fi
 	;;
   stop)
-	stop
-	;;
-  status)
-	status $prog
+	if [ -f /var/lock/subsys/smokeping ]; then
+		msg_stopping smokeping
+		killproc smokeping
+		rm -f /var/lock/subsys/smokeping >/dev/null 2>&1
+	else
+		msg_not_running smokeping
+	fi
 	;;
   restart|reload)
-	stop
-	start
+	$0 stop
+	$0 start
+	exit $?
 	;;
-  condrestart)
-	[ -f /var/lock/subsys/$prog ] && restart || :
+  status)
+	status smokeping
+	exit $?
 	;;
   *)
-	echo $"Usage: $0 {start|stop|status|restart|reload|condrestart}"
-	exit 1
+	msg_usage "$0 {start|stop|restart|reload|status}"
+	exit 3
 esac
 
-exit $?
+exit $RETVAL
