@@ -1,18 +1,19 @@
 Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl):	Smokeping - narzêdzie do tworzenia wykresów opó¼nieñ sieci
 Name:		smokeping
-Version:	1.34
+Version:	1.36
 Release:	1
 Vendor:		Tobias Oetiker
 License:	GPL
 Group:		Networking/Utilities
 Source0:	http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/%{name}-%{version}.tar.gz
-# Source0-md5:	7b721b0f8369db30fb59bd11fc13a516
+# Source0-md5:	2d2553acf3bb239c4093d1b827c11550
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}-config
 URL:		http://people.ee.ethz.ch/~oetiker/webtools/smokeping/
 BuildRequires:	perl-tools-pod
+BuildRequires:	rrdtool
 PreReq:		rc-scripts
 Requires(post,preun):	/sbin/chkconfig
 Requires:	fping
