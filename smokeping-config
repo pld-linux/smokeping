@@ -1,0 +1,103 @@
+*** General ***
+
+owner		= Charlie Root
+contact		= root@localhost
+
+# apache has to be able to write to this one
+imgcache = /var/lib/smokeping/img
+imgurl   = /simg
+
+# daemon puts rrds in here
+datadir = /var/lib/smokeping/rrd
+piddir  = /var/run
+
+smokemail	= /etc/smokeping/smokemail
+cgiurl		= http://localhost/smokeping
+# either or both of these? (mailhost uses Net::SMTP)
+mailhost	= localhost
+sendmail	= /usr/sbin/sendmail
+
+# specify this to get syslog logging
+syslogfacility = local0
+#syslogpriority = debug
+
+
+*** Database ***
+
+step     = 300
+pings    = 20
+
+# consfn mrhb steps total
+
+AVERAGE  0.5   1  1008
+AVERAGE  0.5  12  4320
+    MIN  0.5  12  4320
+    MAX  0.5  12  4320
+AVERAGE  0.5 144   720
+    MAX  0.5 144   720
+    MIN  0.5 144   720
+
+
+*** Presentation ***
+
+template = /etc/smokeping/basepage.html
+
++ overview 
+ width	= 480
+ height	= 100
+ range	= 40h
+
++ detail
+ width	= 480
+ height	= 200
+ unison_tolerance = 2
+ "Last 3 Hours"		3h
+ "Last 24 Hours"	24h
+ "Last 7 Days"		7d
+ "Last 30 Days"		30d
+ "Last 365 Days"	365d
+
+++ loss_colors
+  0	00ff00	"0"
+  1	c0ff00	"1"
+  2	ffff00	"2"
+  3	ffc080	"3"
+  4	ff80e0	"4"
+  20	ff0000	"5+"
+
+
+*** Probes ***
+
++ FPing
+ binary = /usr/sbin/fping
+
++ EchoPingSmtp
+ binary = /usr/bin/echoping
+
++ EchoPingHttp
+ binary = /usr/bin/echoping
+
+
+*** Targets ***
+
+probe = FPing
+
+menu = Top
+title = Network Latency Grapher
+remark = Welcome to SmokePing on localhost. \
+         Here you will learn all about network latency.
+
++ local
+ menu	= Local Host
+ title	= This Computer
+ host	= localhost
+++ http
+  menu	= Web Server
+  title	= HTTP Web Server
+  probe	= EchoPingHttp
+  host	= localhost
+++ smtp
+  menu	= Mail Server
+  title	= SMTP Mail Server
+  probe	= EchoPingSmtp
+  host	= localhost
