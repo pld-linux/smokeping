@@ -4,7 +4,7 @@ Name:		smokeping
 Version:	1.38
 Release:	1
 Vendor:		Tobias Oetiker
-License:	GPL
+License:	GPL v2
 Group:		Networking/Utilities
 Source0:	http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/%{name}-%{version}.tar.gz
 # Source0-md5:	d885a9d27fdbbc3ddf8f3295d283faa8
