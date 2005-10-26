@@ -19,7 +19,8 @@ PreReq:		rc-scripts
 Requires(post,preun):	/sbin/chkconfig
 Requires:	fping
 Requires:	perl-base
-Requires:	rrdtool
+Requires:	perl-rrdtool
+Requires:	rrdtool < 1.2
 Requires:	webserver
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
