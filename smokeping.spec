@@ -1,13 +1,12 @@
 Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl):	Smokeping - narzêdzie do tworzenia wykresów opó¼nieñ sieci
 Name:		smokeping
-Version:	1.43
-Release:	1
-Vendor:		Tobias Oetiker
+Version:	2.0.4
+Release:	0.1
 License:	GPL v2
 Group:		Networking/Utilities
 Source0:	http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/%{name}-%{version}.tar.gz
-# Source0-md5:	eaa039842f5b5ced094c8c6924aa2f6e
+# Source0-md5:	21d968154f1632575ea65843f1dd765f
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}-config
@@ -20,7 +19,7 @@ Requires(post,preun):	/sbin/chkconfig
 Requires:	fping
 Requires:	perl-base
 Requires:	perl-rrdtool
-Requires:	rrdtool < 1.2
+Requires:	rrdtool >= 1.2
 Requires:	webserver
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
@@ -61,7 +60,7 @@ decruft %{_bindir}/speedy %{_bindir}/perl
 # working config in wrong location
 decruft "etc/config.dist" "%{_sysconfdir}/%{name}/config"
 
-sed -i -e 's@^#!/usr/bin/perl-5.8.0@#!/usr/bin/perl@' bin/smokeping.dist
+sed -i -e 's@^#!/usr/bin/perl-5.8.4@#!/usr/bin/perl@' bin/smokeping.dist
 
 %install
 rm -rf $RPM_BUILD_ROOT
@@ -72,7 +71,7 @@ install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir}/%{name},%{_wwwconfdir
 
 install etc/basepage.html.dist $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/basepage.html
 install etc/config.dist $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
-install etc/config-echoping.dist $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/config-echoping
+#install etc/config-echoping.dist $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/config-echoping
 install etc/smokemail.dist $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/smokemail
 install bin/smokeping.dist $RPM_BUILD_ROOT%{_bindir}/smokeping
 install htdocs/smokeping.cgi.dist $RPM_BUILD_ROOT%{_cgi_bindir}/smokeping.cgi
