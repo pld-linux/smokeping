@@ -61,7 +61,7 @@ decruft %{_bindir}/speedy %{_bindir}/perl
 decruft "etc/config.dist" "%{_sysconfdir}/%{name}/config"
 
 sed -i -e 's@^#!/usr/bin/perl-5.8.4@#!/usr/bin/perl@' bin/smokeping.dist
-sed -i -e 's#use lib qw(lib);#use lib qw(%{_datadir}/%{name});#' smokeping.dist
+sed -i -e 's#use lib qw(lib);#use lib qw(%{_datadir}/%{name});#' bin/smokeping.dist
 
 %install
 rm -rf $RPM_BUILD_ROOT
