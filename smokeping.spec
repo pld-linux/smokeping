@@ -1,12 +1,12 @@
 Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl):	Smokeping - narzêdzie do tworzenia wykresów opó¼nieñ sieci
 Name:		smokeping
-Version:	2.0.4
+Version:	2.0.5
 Release:	0.2
 License:	GPL v2
 Group:		Networking/Utilities
 Source0:	http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/%{name}-%{version}.tar.gz
-# Source0-md5:	21d968154f1632575ea65843f1dd765f
+# Source0-md5:	c965439c147012b91585c3e134225b4d
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}-config
@@ -75,6 +75,7 @@ install etc/config.dist $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
 #install etc/config-echoping.dist $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/config-echoping
 install etc/smokemail.dist $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/smokemail
 install bin/smokeping.dist $RPM_BUILD_ROOT%{_bindir}/smokeping
+install bin/tSmoke.dist $RPM_BUILD_ROOT%{_bindir}/tSmoke
 install htdocs/smokeping.cgi.dist $RPM_BUILD_ROOT%{_cgi_bindir}/smokeping.cgi
 cp -r lib/* $RPM_BUILD_ROOT%{_datadir}/%{name}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
@@ -108,11 +109,11 @@ echo "++ dns$dnscnt
         " >>%{_sysconfdir}/%{name}/config
 done
 
-[ "$HOSTNAME" ] && %{__perl} -pi -e "s|localhost|$HOSTNAME|g" %{_sysconfdir}/%{name}/config 
+[ "$HOSTNAME" ] && %{__perl} -pi -e "s|localhost|$HOSTNAME|g" %{_sysconfdir}/%{name}/config
 
 fi
 
-/sbin/chkconfig --add %{name} 
+/sbin/chkconfig --add %{name}
 
 if [ -f /var/lock/subsys/%{name} ]; then
 	/etc/rc.d/init.d/%{name} restart 1>&2
@@ -130,7 +131,7 @@ if [ $1 = 0 ]; then
 		/etc/rc.d/init.d/%{name} stop 1>&2
 	fi
 
-	/sbin/chkconfig --del %{name} 
+	/sbin/chkconfig --del %{name}
 
 	if [ -f /var/lock/subsys/httpd ]; then
 		/etc/rc.d/init.d/httpd restart 1>&2
@@ -144,8 +145,8 @@ fi
 %{_datadir}/smokeping
 %{_mandir}/man1/*.1*
 %dir %{_sysconfdir}/%{name}
-%config(noreplace) %verify(not size mtime md5) %{_sysconfdir}/%{name}/*
-%config(noreplace) %verify(not size mtime md5) %{_wwwconfdir}/*
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/*
+%config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/*
 %attr(754,root,root) /etc/rc.d/init.d/*
 %attr(755,root,root) %{_cgi_bindir}/*
 %dir %{_sharedstatedir}/%{name}
