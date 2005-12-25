@@ -2,7 +2,7 @@ Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl):	Smokeping - narzêdzie do tworzenia wykresów opó¼nieñ sieci
 Name:		smokeping
 Version:	2.0.5
-Release:	0.2
+Release:	1
 License:	GPL v2
 Group:		Networking/Utilities
 Source0:	http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/%{name}-%{version}.tar.gz
@@ -12,20 +12,24 @@ Source2:	%{name}.conf
 Source3:	%{name}-config
 URL:		http://people.ee.ethz.ch/~oetiker/webtools/smokeping/
 BuildRequires:	perl-tools-pod
+BuildRequires:	rpmbuild(macros) >= 1.264
 BuildRequires:	rrdtool
 BuildRequires:	sed >= 4.0
-PreReq:		rc-scripts
+Requires(post):	sed >= 4.0
 Requires(post,preun):	/sbin/chkconfig
 Requires:	fping
 Requires:	perl-base
 Requires:	perl-rrdtool
+Requires:	rc-scripts
 Requires:	rrdtool >= 1.2
-Requires:	webserver
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
-%define		_wwwconfdir	/etc/httpd/httpd.conf
-%define		_cgi_bindir	/home/services/httpd/cgi-bin
+%define		_sysconfdir	/etc/%{name}
+%define		_webapps	/etc/webapps
+%define		_webapp		%{name}
+%define		_wwwconfdir	%{_webapps}/%{_webapp}
+%define		_cgi_bindir	%{_prefix}/share/%{name}
 
 %description
 SmokePing is a ICMP latency logging and graphing system. It consists
@@ -37,18 +41,24 @@ Smokeping jest narzêdziem do tworzenia wykresów aktywno¶ci sieci.
 U¿ywaj±c pakietów ICMP zapisuje czas odpowiedzi poszczególnych hostów
 i wy¶wietla je w postaci czytelnego wykresu.
 
+%package cgi
+Summary:	CGI webinterface for smokeping
+Group:		Applications/WWW
+Requires:	%{name} = %{version}-%{release}
+Requires:	webapps
+
+%description cgi
+CGI webinterface for smokeping
+
 %prep
 %setup -q
 
-%build
-%{__make}
-
-decruft() { %{__perl} -pi -e "s|$1|$2|g" `grep -lr "$1" *` ;}
+decruft() { %{__sed} -i -e "s|$1|$2|g" `grep -lr "$1" *` ;}
 
 # eliminate Tobi's quirks
 decruft /usr/sepp/bin %{_bindir}
 
-decruft /home/oetiker/data/projects/AADJ-smokeping/dist/etc	%{_sysconfdir}/%{name}
+decruft /home/oetiker/data/projects/AADJ-smokeping/dist/etc	%{_sysconfdir}
 decruft /home/oetiker/data/projects/AADJ-smokeping/dist/lib	%{_datadir}/%{name}
 
 # rrdtool package goes into standard perl tree
@@ -58,29 +68,32 @@ decruft '^use lib .*rrdtool.*;' ''
 decruft %{_bindir}/speedy %{_bindir}/perl
 
 # working config in wrong location
-decruft "etc/config.dist" "%{_sysconfdir}/%{name}/config"
+decruft "etc/config.dist" "%{_sysconfdir}/config"
 
 sed -i -e 's@^#!/usr/bin/perl-5.8.4@#!/usr/bin/perl@' bin/smokeping.dist
 sed -i -e 's#use lib qw(lib);#use lib qw(%{_datadir}/%{name});#' bin/smokeping.dist
 
+%build
+%{__make}
+
 %install
 rm -rf $RPM_BUILD_ROOT
-
-install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir}/%{name},%{_wwwconfdir},%{_bindir}} \
+install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir},%{_wwwconfdir},%{_bindir}} \
 	$RPM_BUILD_ROOT{%{_datadir}/%{name},%{_sharedstatedir}/%{name}/{img,rrd},%{_cgi_bindir}} \
 	$RPM_BUILD_ROOT%{_mandir}/man1
 
-install etc/basepage.html.dist $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/basepage.html
-install etc/config.dist $RPM_BUILD_ROOT%{_sysconfdir}/%{name}
-#install etc/config-echoping.dist $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/config-echoping
-install etc/smokemail.dist $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/smokemail
+install etc/basepage.html.dist $RPM_BUILD_ROOT%{_sysconfdir}/basepage.html
+install etc/config.dist $RPM_BUILD_ROOT%{_sysconfdir}
+#install etc/config-echoping.dist $RPM_BUILD_ROOT%{_sysconfdir}/config-echoping
+install etc/smokemail.dist $RPM_BUILD_ROOT%{_sysconfdir}/smokemail
 install bin/smokeping.dist $RPM_BUILD_ROOT%{_bindir}/smokeping
 install bin/tSmoke.dist $RPM_BUILD_ROOT%{_bindir}/tSmoke
 install htdocs/smokeping.cgi.dist $RPM_BUILD_ROOT%{_cgi_bindir}/smokeping.cgi
 cp -r lib/* $RPM_BUILD_ROOT%{_datadir}/%{name}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
-install %{SOURCE2} $RPM_BUILD_ROOT%{_wwwconfdir}/99_%{name}.conf
-install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/%{name}/config
+install %{SOURCE2} $RPM_BUILD_ROOT%{_wwwconfdir}/httpd.conf
+install %{SOURCE2} $RPM_BUILD_ROOT%{_wwwconfdir}/apache.conf
+install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/config
 install doc/*.1 $RPM_BUILD_ROOT%{_mandir}/man1
 
 %clean
@@ -89,7 +102,7 @@ rm -rf $RPM_BUILD_ROOT
 %post
 if [ "$1" = "1" ]; then
 
-firstgate=`route -n |awk '$1=="0.0.0.0" && $4 ~ /G/ {print $2}' |head -1`
+firstgate=`route -n |awk '$1=="0.0.0.0" && $4 ~ /G/ {print $2}' | head -n 1`
 echo "
 + gateway
  menu   = Default Gateway
@@ -99,17 +112,17 @@ echo "
 + dns
  menu   = DNS Servers
  title  = Domain Name Servers
-        " >>%{_sysconfdir}/%{name}/config
-for dns in `awk '$1 ~ /^nameserver/ {print $2}' /etc/resolv.conf |sort -u` ; do
+        " >> %{_sysconfdir}/config
+for dns in `awk '$1 ~ /^nameserver/ {print $2}' /etc/resolv.conf | LC_ALL=C sort -u` ; do
 ((dnscnt++))
 echo "++ dns$dnscnt
   menu  = DNS Server $dnscnt
   title = Domain Name Server $dnscnt
   host  = $dns
-        " >>%{_sysconfdir}/%{name}/config
+        " >> %{_sysconfdir}/config
 done
 
-[ "$HOSTNAME" ] && %{__perl} -pi -e "s|localhost|$HOSTNAME|g" %{_sysconfdir}/%{name}/config
+[ "$HOSTNAME" ] && %{__sed} -i -e "s|localhost|$HOSTNAME|g" %{_sysconfdir}/config
 
 fi
 
@@ -121,10 +134,6 @@ else
 	echo "Run \"/etc/rc.d/init.d/%{name} start\" to start smokeping."
 fi
 
-if [ -f /var/lock/subsys/httpd ]; then
-	/etc/rc.d/init.d/httpd restart 1>&2
-fi
-
 %preun
 if [ $1 = 0 ]; then
 	if [ -f /var/lock/subsys/%{name} ]; then
@@ -132,23 +141,54 @@ if [ $1 = 0 ]; then
 	fi
 
 	/sbin/chkconfig --del %{name}
-
-	if [ -f /var/lock/subsys/httpd ]; then
-		/etc/rc.d/init.d/httpd restart 1>&2
-	fi
 fi
+
+%triggerin cgi -- apache1
+%webapp_register apache %{_webapp}
+
+%triggerun cgi -- apache1
+%webapp_unregister apache %{_webapp}
+
+%triggerin cgi -- apache >= 2.0.0
+%webapp_register httpd %{_webapp}
+
+%triggerun cgi -- apache >= 2.0.0
+%webapp_unregister httpd %{_webapp}
+
+%triggerpostun -- %{name} < 2.0.5-0.3
+# we put trigger on main package, because we can't trigger in new package
+# this will create .rpmnew files when one installs -cgi package. but that's more than okay
+
+if [ -f /etc/httpd/httpd.conf/99_%{name}.conf.rpmsave ]; then
+	install -d %{_wwwconfdir}
+	mv -f /etc/httpd/httpd.conf/99_%{name}.conf.rpmsave %{_wwwconfdir}/httpd.conf
+fi
+
+if [ -f /var/lock/subsys/httpd ]; then
+	/etc/rc.d/init.d/httpd reload 1>&2
+fi
+
+%banner -e %{name} << EOF
+The CGI program is available as %{name}-cgi package.
+EOF
 
 %files
 %defattr(644,root,root,755)
 %doc CHANGES CONTRIBUTORS COPYRIGHT README TODO doc/*.txt doc/*.html
 %attr(755,root,root) %{_bindir}/*
 %{_datadir}/smokeping
+%exclude %{_datadir}/smokeping/*.cgi
 %{_mandir}/man1/*.1*
-%dir %{_sysconfdir}/%{name}
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/%{name}/*
-%config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/*
+%dir %{_sysconfdir}
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/*
 %attr(754,root,root) /etc/rc.d/init.d/*
-%attr(755,root,root) %{_cgi_bindir}/*
 %dir %{_sharedstatedir}/%{name}
 %{_sharedstatedir}/%{name}/rrd
 %attr(775,root,http) %{_sharedstatedir}/%{name}/img
+
+%files cgi
+%defattr(644,root,root,755)
+%dir %attr(750,root,http) %{_wwwconfdir}
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/apache.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/httpd.conf
+%attr(755,root,root) %{_cgi_bindir}/*.cgi
