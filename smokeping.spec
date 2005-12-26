@@ -43,12 +43,16 @@ i wy¶wietla je w postaci czytelnego wykresu.
 
 %package cgi
 Summary:	CGI webinterface for smokeping
+Summary(pl):	Interfejs WWW (CGI) do smokepinga
 Group:		Applications/WWW
 Requires:	%{name} = %{version}-%{release}
 Requires:	webapps
 
 %description cgi
-CGI webinterface for smokeping
+CGI webinterface for smokeping.
+
+%description cgi -l pl
+Interfejs WWW (CGI) do smokepinga.
 
 %prep
 %setup -q
