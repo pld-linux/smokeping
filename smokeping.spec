@@ -1,8 +1,15 @@
+# TODO
+# - resolve permission problem for webserver access to /usr/sbin/fping
+# - generated config does not always match the used webserver vhost (don't autogenerate it at all?)
+# - finish -cgi and main files, afaik templates/ needed only by -cgi
+# - use .patch not decruft()
+# - use other user than root for daemon (uid=stats perhaps)
+%include	/usr/lib/rpm/macros.perl
 Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl):	Smokeping - narzêdzie do tworzenia wykresów opó¼nieñ sieci
 Name:		smokeping
 Version:	2.0.5
-Release:	2
+Release:	2.5
 License:	GPL v2
 Group:		Networking/Utilities
 Source0:	http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/%{name}-%{version}.tar.gz
@@ -12,14 +19,13 @@ Source2:	%{name}.conf
 Source3:	%{name}-config
 URL:		http://people.ee.ethz.ch/~oetiker/webtools/smokeping/
 BuildRequires:	perl-tools-pod
+BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.264
 BuildRequires:	rrdtool
 BuildRequires:	sed >= 4.0
 Requires(post):	sed >= 4.0
 Requires(post,preun):	/sbin/chkconfig
 Requires:	fping
-Requires:	perl-base
-Requires:	perl-rrdtool
 Requires:	rc-scripts
 Requires:	rrdtool >= 1.2
 BuildArch:	noarch
@@ -82,7 +88,7 @@ sed -i -e 's#use lib qw(lib);#use lib qw(%{_datadir}/%{name});#' bin/smokeping.d
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir},%{_wwwconfdir},%{_bindir}} \
+install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir},%{_wwwconfdir},%{_sbindir}} \
 	$RPM_BUILD_ROOT{%{_datadir}/%{name},%{_sharedstatedir}/%{name}/{img,rrd},%{_cgi_bindir}} \
 	$RPM_BUILD_ROOT%{_mandir}/man1
 
@@ -90,8 +96,8 @@ install etc/basepage.html.dist $RPM_BUILD_ROOT%{_sysconfdir}/basepage.html
 install etc/config.dist $RPM_BUILD_ROOT%{_sysconfdir}
 #install etc/config-echoping.dist $RPM_BUILD_ROOT%{_sysconfdir}/config-echoping
 install etc/smokemail.dist $RPM_BUILD_ROOT%{_sysconfdir}/smokemail
-install bin/smokeping.dist $RPM_BUILD_ROOT%{_bindir}/smokeping
-install bin/tSmoke.dist $RPM_BUILD_ROOT%{_bindir}/tSmoke
+install bin/smokeping.dist $RPM_BUILD_ROOT%{_sbindir}/smokeping
+install bin/tSmoke.dist $RPM_BUILD_ROOT%{_sbindir}/tSmoke
 install htdocs/smokeping.cgi.dist $RPM_BUILD_ROOT%{_cgi_bindir}/smokeping.cgi
 cp -r lib/* $RPM_BUILD_ROOT%{_datadir}/%{name}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
@@ -131,7 +137,6 @@ done
 fi
 
 /sbin/chkconfig --add %{name}
-
 if [ -f /var/lock/subsys/%{name} ]; then
 	/etc/rc.d/init.d/%{name} restart 1>&2
 else
@@ -162,7 +167,6 @@ fi
 %triggerpostun -- %{name} < 2.0.5-0.3
 # we put trigger on main package, because we can't trigger in new package
 # this will create .rpmnew files when one installs -cgi package. but that's more than okay
-
 if [ -f /etc/httpd/httpd.conf/99_%{name}.conf.rpmsave ]; then
 	install -d %{_wwwconfdir}
 	mv -f /etc/httpd/httpd.conf/99_%{name}.conf.rpmsave %{_wwwconfdir}/httpd.conf
@@ -179,7 +183,7 @@ EOF
 %files
 %defattr(644,root,root,755)
 %doc CHANGES CONTRIBUTORS COPYRIGHT README TODO doc/*.txt doc/*.html
-%attr(755,root,root) %{_bindir}/*
+%attr(755,root,root) %{_sbindir}/*
 %{_datadir}/smokeping
 %exclude %{_datadir}/smokeping/*.cgi
 %{_mandir}/man1/*.1*
@@ -188,7 +192,7 @@ EOF
 %attr(754,root,root) /etc/rc.d/init.d/*
 %dir %{_sharedstatedir}/%{name}
 %{_sharedstatedir}/%{name}/rrd
-%attr(775,root,http) %{_sharedstatedir}/%{name}/img
+%dir %attr(775,root,http) %{_sharedstatedir}/%{name}/img
 
 %files cgi
 %defattr(644,root,root,755)
