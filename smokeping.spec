@@ -1,9 +1,9 @@
 # TODO
-# - resolve permission problem for webserver access to /usr/sbin/fping
+# - IMPORTANT: resolve permission problem for webserver access to /usr/sbin/fping
 # - generated config does not always match the used webserver vhost (don't autogenerate it at all?)
 # - finish -cgi and main files, afaik templates/ needed only by -cgi
 # - use .patch not decruft()
-# - use other user than root for daemon (uid=stats perhaps)
+# - IMPORTANT: use other user than root for daemon (uid=stats perhaps)
 %include	/usr/lib/rpm/macros.perl
 Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl):	Smokeping - narzêdzie do tworzenia wykresów opó¼nieñ sieci
