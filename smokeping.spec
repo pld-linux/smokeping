@@ -20,7 +20,7 @@ Source3:	%{name}-config
 URL:		http://people.ee.ethz.ch/~oetiker/webtools/smokeping/
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpm-perlprov >= 4.1-13
-BuildRequires:	rpmbuild(macros) >= 1.264
+BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	rrdtool
 BuildRequires:	sed >= 4.0
 Requires(post):	sed >= 4.0
@@ -137,18 +137,11 @@ done
 fi
 
 /sbin/chkconfig --add %{name}
-if [ -f /var/lock/subsys/%{name} ]; then
-	/etc/rc.d/init.d/%{name} restart 1>&2
-else
-	echo "Run \"/etc/rc.d/init.d/%{name} start\" to start smokeping."
-fi
+%service %{name} restart
 
 %preun
-if [ $1 = 0 ]; then
-	if [ -f /var/lock/subsys/%{name} ]; then
-		/etc/rc.d/init.d/%{name} stop 1>&2
-	fi
-
+if [ "$1" = 0 ]; then
+	%service %{name} stop
 	/sbin/chkconfig --del %{name}
 fi
 
@@ -172,9 +165,7 @@ if [ -f /etc/httpd/httpd.conf/99_%{name}.conf.rpmsave ]; then
 	mv -f /etc/httpd/httpd.conf/99_%{name}.conf.rpmsave %{_wwwconfdir}/httpd.conf
 fi
 
-if [ -f /var/lock/subsys/httpd ]; then
-	/etc/rc.d/init.d/httpd reload 1>&2
-fi
+%service -q httpd reload
 
 %banner -e %{name} << EOF
 The CGI program is available as %{name}-cgi package.
