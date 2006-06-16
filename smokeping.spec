@@ -9,7 +9,7 @@ Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl):	Smokeping - narzêdzie do tworzenia wykresów opó¼nieñ sieci
 Name:		smokeping
 Version:	2.0.5
-Release:	4
+Release:	5
 License:	GPL v2
 Group:		Networking/Utilities
 Source0:	http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/%{name}-%{version}.tar.gz
@@ -17,6 +17,7 @@ Source0:	http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/%{name}-%{vers
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}-config
+Source4:	%{name}-lighttpd.conf
 URL:		http://people.ee.ethz.ch/~oetiker/webtools/smokeping/
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpm-perlprov >= 4.1-13
@@ -103,6 +104,7 @@ cp -r lib/* $RPM_BUILD_ROOT%{_datadir}/%{name}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 install %{SOURCE2} $RPM_BUILD_ROOT%{_wwwconfdir}/httpd.conf
 install %{SOURCE2} $RPM_BUILD_ROOT%{_wwwconfdir}/apache.conf
+install %{SOURCE4} $RPM_BUILD_ROOT%{_wwwconfdir}/lighttpd.conf
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/config
 install doc/*.1 $RPM_BUILD_ROOT%{_mandir}/man1
 
@@ -157,6 +159,12 @@ fi
 %triggerun cgi -- apache < 2.2.0, apache-base
 %webapp_unregister httpd %{_webapp}
 
+%triggerin -- lighttpd
+%webapp_register lighttpd %{_webapp}
+
+%triggerun -- lighttpd
+%webapp_unregister lighttpd %{_webapp}
+
 %triggerpostun -- %{name} < 2.0.5-0.3
 # we put trigger on main package, because we can't trigger in new package
 # this will create .rpmnew files when one installs -cgi package. but that's more than okay
@@ -190,4 +198,5 @@ EOF
 %dir %attr(750,root,http) %{_wwwconfdir}
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/apache.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/httpd.conf
+%attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/lighttpd.conf
 %attr(755,root,root) %{_cgi_bindir}/*.cgi
