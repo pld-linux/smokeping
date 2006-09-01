@@ -13,7 +13,7 @@ Release:	1
 License:	GPL v2
 Group:		Networking/Utilities
 Source0:	http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/%{name}-%{version}.tar.gz
-# Source0-md5:	c965439c147012b91585c3e134225b4d
+# Source0-md5:	512c0bc38176451df7d664050b1283d9
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}-config
