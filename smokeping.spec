@@ -6,7 +6,7 @@
 # - IMPORTANT: use other user than root for daemon (uid=stats perhaps)
 %include	/usr/lib/rpm/macros.perl
 Summary:	Smokeping - a latency grapher that uses rrdtool
-Summary(pl.UTF-8):   Smokeping - narzędzie do tworzenia wykresów opóźnień sieci
+Summary(pl.UTF-8):	Smokeping - narzędzie do tworzenia wykresów opóźnień sieci
 Name:		smokeping
 Version:	2.0.9
 Release:	1
@@ -50,7 +50,7 @@ i wyświetla je w postaci czytelnego wykresu.
 
 %package cgi
 Summary:	CGI webinterface for smokeping
-Summary(pl.UTF-8):   Interfejs WWW (CGI) do smokepinga
+Summary(pl.UTF-8):	Interfejs WWW (CGI) do smokepinga
 Group:		Applications/WWW
 Requires:	%{name} = %{version}-%{release}
 Requires:	webapps
