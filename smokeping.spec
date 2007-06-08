@@ -12,13 +12,13 @@ Version:	2.0.9
 Release:	1
 License:	GPL v2
 Group:		Networking/Utilities
-Source0:	http://people.ee.ethz.ch/~oetiker/webtools/smokeping/pub/%{name}-%{version}.tar.gz
+Source0:	http://oss.oetiker.ch/smokeping/pub/%{name}-%{version}.tar.gz
 # Source0-md5:	512c0bc38176451df7d664050b1283d9
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}-config
 Source4:	%{name}-lighttpd.conf
-URL:		http://people.ee.ethz.ch/~oetiker/webtools/smokeping/
+URL:		http://oss.oetiker.ch/smokeping/
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.268
