@@ -22,9 +22,7 @@ else
 	exit 0
 fi
 
-RETVAL=0
-case "$1" in
-  start)
+start() {
 	if [ ! -f /var/lock/subsys/smokeping ]; then
 		msg_starting smokeping
 		daemon smokeping
@@ -33,8 +31,9 @@ case "$1" in
 	else
 		msg_already_running smokeping
 	fi
-	;;
-  stop)
+}
+
+stop() {
 	if [ -f /var/lock/subsys/smokeping ]; then
 		msg_stopping smokeping
 		killproc smokeping
@@ -42,10 +41,19 @@ case "$1" in
 	else
 		msg_not_running smokeping
 	fi
+}
+
+RETVAL=0
+case "$1" in
+  start)
+  	start
+	;;
+  stop)
+  	stop
 	;;
   restart|reload)
-	$0 stop
-	$0 start
+	stop
+	start
 	exit $?
 	;;
   status)
