@@ -22,7 +22,6 @@ URL:		http://oss.oetiker.ch/smokeping/
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.268
-BuildRequires:	rrdtool
 BuildRequires:	sed >= 4.0
 Requires(post):	sed >= 4.0
 Requires(post,preun):	/sbin/chkconfig
