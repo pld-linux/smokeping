@@ -126,7 +126,7 @@ echo "
  title  = Domain Name Servers
         " >> %{_sysconfdir}/config
 for dns in `awk '$1 ~ /^nameserver/ {print $2}' /etc/resolv.conf | LC_ALL=C sort -u` ; do
-((dnscnt++))
+dnscnt=$((dnscnt+1))
 echo "++ dns$dnscnt
   menu  = DNS Server $dnscnt
   title = Domain Name Server $dnscnt
