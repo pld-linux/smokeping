@@ -66,7 +66,7 @@ Interfejs WWW (CGI) do smokepinga.
 decruft() { %{__sed} -i -e "s|$1|$2|g" `grep -lr "$1" *` ;}
 
 # eliminate Tobi's quirks
-decruft /usr/sepp/bin %{_bindir}
+decruft %{_prefix}/sepp/bin %{_bindir}
 
 decruft /home/oetiker/data/projects/AADJ-smokeping/dist/etc	%{_sysconfdir}
 decruft /home/oetiker/data/projects/AADJ-smokeping/dist/lib	%{_datadir}/%{name}
@@ -75,7 +75,7 @@ decruft /home/oetiker/data/projects/AADJ-smokeping/dist/lib	%{_datadir}/%{name}
 decruft '^use lib .*rrdtool.*;' ''
 
 # there's no SpeedyCGI for apache2? use regular perl...
-decruft %{_bindir}/speedy %{_bindir}/perl
+decruft %{_bindir}/speedy %{__perl}
 
 # working config in wrong location
 decruft "etc/config.dist" "%{_sysconfdir}/config"
@@ -181,13 +181,19 @@ EOF
 %files
 %defattr(644,root,root,755)
 %doc CHANGES CONTRIBUTORS COPYRIGHT README TODO doc/*.txt doc/*.html
-%attr(755,root,root) %{_sbindir}/*
+%attr(755,root,root) %{_sbindir}/smokeping
+%attr(755,root,root) %{_sbindir}/tSmoke
 %{_datadir}/smokeping
-%exclude %{_datadir}/smokeping/*.cgi
-%{_mandir}/man1/*.1*
+%exclude %{_datadir}/smokeping/smokeping.cgi
+%{_mandir}/man1/smokeping.1*
+%{_mandir}/man1/smokeping.cgi.1*
+%{_mandir}/man1/tSmoke.1*
 %dir %{_sysconfdir}
-%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/*
-%attr(754,root,root) /etc/rc.d/init.d/*
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/basepage.html
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/config
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/config.dist
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/smokemail
+%attr(754,root,root) /etc/rc.d/init.d/smokeping
 %dir %{_sharedstatedir}/%{name}
 %{_sharedstatedir}/%{name}/rrd
 %dir %attr(775,root,http) %{_sharedstatedir}/%{name}/img
@@ -198,4 +204,4 @@ EOF
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/apache.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/httpd.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/lighttpd.conf
-%attr(755,root,root) %{_cgi_bindir}/*.cgi
+%attr(755,root,root) %{_cgi_bindir}/smokeping.cgi
