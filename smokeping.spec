@@ -8,12 +8,12 @@
 Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl.UTF-8):	Smokeping - narzędzie do tworzenia wykresów opóźnień sieci
 Name:		smokeping
-Version:	2.4.1
+Version:	2.4.2
 Release:	1
-License:	GPL v2
+License:	GPL v2+
 Group:		Networking/Utilities
 Source0:	http://oss.oetiker.ch/smokeping/pub/%{name}-%{version}.tar.gz
-# Source0-md5:	b7cda5c04c04cbccd9639160470b57f8
+# Source0-md5:	eb8e7679fcad35e59d7c51f2328250a2
 Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}-config
@@ -65,12 +65,6 @@ Interfejs WWW (CGI) do smokepinga.
 
 decruft() { %{__sed} -i -e "s|$1|$2|g" `grep -lr "$1" *` ;}
 
-# eliminate Tobi's quirks
-decruft %{_prefix}/sepp/bin %{_bindir}
-
-decruft /home/oetiker/data/projects/AADJ-smokeping/dist/etc	%{_sysconfdir}
-decruft /home/oetiker/data/projects/AADJ-smokeping/dist/lib	%{_datadir}/%{name}
-
 # rrdtool package goes into standard perl tree
 decruft '^use lib .*rrdtool.*;' ''
 
@@ -80,7 +74,6 @@ decruft %{_bindir}/speedy %{__perl}
 # working config in wrong location
 decruft "etc/config.dist" "%{_sysconfdir}/config"
 
-sed -i -e 's@^#!/usr/bin/perl-5.8.4@#!/usr/bin/perl@' bin/smokeping.dist
 sed -i -e 's#use lib qw(lib);#use lib qw(%{_datadir}/%{name});#' bin/smokeping.dist
 
 %build
