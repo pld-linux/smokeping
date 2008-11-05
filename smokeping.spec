@@ -1,5 +1,4 @@
 # TODO
-# - IMPORTANT: resolve permission problem for webserver access to /usr/sbin/fping
 # - generated config does not always match the used webserver vhost (don't autogenerate it at all?)
 # - finish -cgi and main files, afaik templates/ needed only by -cgi
 # - use .patch not decruft()
@@ -9,7 +8,7 @@ Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl.UTF-8):	Smokeping - narzędzie do tworzenia wykresów opóźnień sieci
 Name:		smokeping
 Version:	2.4.2
-Release:	1
+Release:	2
 License:	GPL v2+
 Group:		Networking/Utilities
 Source0:	http://oss.oetiker.ch/smokeping/pub/%{name}-%{version}.tar.gz
@@ -28,6 +27,26 @@ Requires(post,preun):	/sbin/chkconfig
 Requires:	fping
 Requires:	rc-scripts
 Requires:	rrdtool >= 1.2
+# NOTE: these modules are optional, not required:
+#	Requires: perl(Authen::Radius)
+#	Requires: perl(Authen::TacacsPlus)
+#	Requires: perl(DBD::Pg)
+#	Requires: perl(DBI)
+#	Requires: perl(DB_File)
+#	Requires: perl(Digest::SHA1)
+#	Requires: perl(FreezeThaw)
+#	Requires: perl(Net::DNS)
+#	Requires: perl(Net::LDAP)
+#	Requires: perl(Net::Telnet)
+#	Requires: perl(URI::Escape)
+#	Requires: perl-Net-DNS
+#	Requires: perl-SNMP_Session
+#	Requires: perl-ldap
+Suggests:	bind-utils
+Suggests:	curl
+Suggests:	echoping
+Suggests:	openssh-clients
+Suggests:	traceroute
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
@@ -65,16 +84,25 @@ Interfejs WWW (CGI) do smokepinga.
 
 decruft() { %{__sed} -i -e "s|$1|$2|g" `grep -lr "$1" *` ;}
 
+# eliminate Tobi's quirks
+decruft /usr/sepp/bin %{_bindir}
+
 # rrdtool package goes into standard perl tree
 decruft '^use lib .*rrdtool.*;' ''
 
 # there's no SpeedyCGI for apache2? use regular perl...
-decruft %{_bindir}/speedy %{__perl}
+decruft /usr/bin/speedy-5.8.8 %{__perl}
+decruft /usr/bin/speedy %{__perl}
 
+sed -i -e '/\/home\/oposs\/smokeping\/software\/lib/d' htdocs/tr.cgi.dist
+sed -i -e '/\/home\/oetiker\/checkouts\/smokeping\/trunk\/software\/lib/d' htdocs/smokeping.cgi.dist
+sed -i -e 's|/home/oetiker/checkouts/smokeping/trunk/software/etc/config.dist|%{_sysconfdir}/config|' htdocs/smokeping.cgi.dist
 # working config in wrong location
 decruft "etc/config.dist" "%{_sysconfdir}/config"
 
 sed -i -e 's#use lib qw(lib);#use lib qw(%{_datadir}/%{name});#' bin/smokeping.dist
+
+sed -i -e 's#"cropper/#"/smokeping/cropper/#' etc/basepage.html.dist
 
 %build
 %{__make}
@@ -83,15 +111,18 @@ sed -i -e 's#use lib qw(lib);#use lib qw(%{_datadir}/%{name});#' bin/smokeping.d
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir},%{_wwwconfdir},%{_sbindir}} \
 	$RPM_BUILD_ROOT{%{_datadir}/%{name},%{_sharedstatedir}/%{name}/{img,rrd},%{_cgi_bindir}} \
-	$RPM_BUILD_ROOT%{_mandir}/man1
+	$RPM_BUILD_ROOT%{_mandir}/man{1,3,5,7}
 
 install etc/basepage.html.dist $RPM_BUILD_ROOT%{_sysconfdir}/basepage.html
 install etc/config.dist $RPM_BUILD_ROOT%{_sysconfdir}
-#install etc/config-echoping.dist $RPM_BUILD_ROOT%{_sysconfdir}/config-echoping
 install etc/smokemail.dist $RPM_BUILD_ROOT%{_sysconfdir}/smokemail
+install etc/smokeping_secrets.dist $RPM_BUILD_ROOT%{_sysconfdir}/smokeping_secrets
+install etc/tmail.dist $RPM_BUILD_ROOT%{_sysconfdir}/tmail
 install bin/smokeping.dist $RPM_BUILD_ROOT%{_sbindir}/smokeping
 install bin/tSmoke.dist $RPM_BUILD_ROOT%{_sbindir}/tSmoke
+cp -r htdocs/{cropper,resource,script,tr.html} $RPM_BUILD_ROOT%{_cgi_bindir}
 install htdocs/smokeping.cgi.dist $RPM_BUILD_ROOT%{_cgi_bindir}/smokeping.cgi
+install htdocs/tr.cgi.dist $RPM_BUILD_ROOT%{_cgi_bindir}/tr.cgi
 cp -r lib/* $RPM_BUILD_ROOT%{_datadir}/%{name}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 install %{SOURCE2} $RPM_BUILD_ROOT%{_wwwconfdir}/httpd.conf
@@ -99,6 +130,10 @@ install %{SOURCE2} $RPM_BUILD_ROOT%{_wwwconfdir}/apache.conf
 install %{SOURCE4} $RPM_BUILD_ROOT%{_wwwconfdir}/lighttpd.conf
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/config
 install doc/*.1 $RPM_BUILD_ROOT%{_mandir}/man1
+# TODO: man(3) pages from subdirectories are packaged in %_docdir too, clean them up
+install doc/{,Config/,Smokeping/{,matchers/,probes/,sorters/}}*.3 $RPM_BUILD_ROOT%{_mandir}/man3
+install doc/*.5 $RPM_BUILD_ROOT%{_mandir}/man5
+install doc/*.7 $RPM_BUILD_ROOT%{_mandir}/man7
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -173,19 +208,29 @@ EOF
 
 %files
 %defattr(644,root,root,755)
-%doc CHANGES CONTRIBUTORS COPYRIGHT README TODO doc/*.txt doc/*.html
+%doc CHANGES CONTRIBUTORS COPYRIGHT README TODO doc/*.html doc/*.txt doc/Config doc/Smokeping doc/examples
 %attr(755,root,root) %{_sbindir}/smokeping
 %attr(755,root,root) %{_sbindir}/tSmoke
 %{_datadir}/smokeping
+%exclude %{_cgi_bindir}/cropper
 %exclude %{_datadir}/smokeping/smokeping.cgi
+%exclude %{_cgi_bindir}/resource
+%exclude %{_cgi_bindir}/script
+%exclude %{_datadir}/smokeping/tr.cgi
+%exclude %{_datadir}/smokeping/tr.html
 %{_mandir}/man1/smokeping.1*
 %{_mandir}/man1/smokeping.cgi.1*
 %{_mandir}/man1/tSmoke.1*
+%{_mandir}/man3/*.3*
+%{_mandir}/man5/*.5*
+%{_mandir}/man7/*.7*
 %dir %{_sysconfdir}
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/basepage.html
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/config
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/config.dist
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/smokemail
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/smokeping_secrets
+%config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/tmail
 %attr(754,root,root) /etc/rc.d/init.d/smokeping
 %dir %{_sharedstatedir}/%{name}
 %{_sharedstatedir}/%{name}/rrd
@@ -197,4 +242,9 @@ EOF
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/apache.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/httpd.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/lighttpd.conf
+%{_cgi_bindir}/cropper
 %attr(755,root,root) %{_cgi_bindir}/smokeping.cgi
+%{_cgi_bindir}/resource
+%{_cgi_bindir}/script
+%attr(755,root,root) %{_cgi_bindir}/tr.cgi
+%{_cgi_bindir}/tr.html
