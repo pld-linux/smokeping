@@ -87,6 +87,11 @@ title = Network Latency Grapher
 remark = Welcome to SmokePing on localhost. \
          Here you will learn all about network latency.
 
+menuextra = <a target='_blank' href='/smokeping/tr.html{HOST}' class='{CLASS}' \
+	onclick="window.open(this.href,this.target, \
+	'width=800,height=500,toolbar=no,location=no,status=no,scrollbars=no'); \
+	return false;">*</a>
+
 + local
  menu	= Local Host
  title	= This Computer
