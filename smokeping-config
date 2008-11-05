@@ -43,12 +43,12 @@ AVERAGE  0.5 144   720
 template = /etc/smokeping/basepage.html
 
 + overview 
- width	= 470
+ width	= 480
  height	= 100
  range	= 40h
 
 + detail
- width	= 470
+ width	= 480
  height	= 200
  unison_tolerance = 2
  "Last 3 Hours"		3h
@@ -71,6 +71,12 @@ template = /etc/smokeping/basepage.html
 + FPing
  binary = /usr/sbin/fping
 
++ EchoPingSmtp
+ binary = /usr/bin/echoping
+
++ EchoPingHttp
+ binary = /usr/bin/echoping
+
 
 *** Targets ***
 
@@ -88,8 +94,10 @@ remark = Welcome to SmokePing on localhost. \
 ++ http
   menu	= Web Server
   title	= HTTP Web Server
+  probe	= EchoPingHttp
   host	= localhost
 ++ smtp
   menu	= Mail Server
   title	= SMTP Mail Server
+  probe	= EchoPingSmtp
   host	= localhost
