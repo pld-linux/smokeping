@@ -82,7 +82,7 @@ Interfejs WWW (CGI) do smokepinga.
 %prep
 %setup -q
 
-decruft() { %{__sed} -i -e "s|$1|$2|g" `grep -lr "$1" *` ;}
+decruft() { grep -lr "$1" . | xargs %{__sed} -i -e "s|$1|$2|g"; }
 
 # eliminate Tobi's quirks
 decruft /usr/sepp/bin %{_bindir}
