@@ -1,14 +1,12 @@
 # TODO
-# - generated config does not always match the used webserver vhost (don't autogenerate it at all?)
 # - finish -cgi and main files, afaik templates/ needed only by -cgi
 # - use .patch not decruft()
-# - IMPORTANT: use other user than root for daemon (uid=stats perhaps)
 %include	/usr/lib/rpm/macros.perl
 Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl.UTF-8):	Smokeping - narzędzie do tworzenia wykresów opóźnień sieci
 Name:		smokeping
 Version:	2.4.2
-Release:	2
+Release:	3
 License:	GPL v2+
 Group:		Networking/Utilities
 Source0:	http://oss.oetiker.ch/smokeping/pub/%{name}-%{version}.tar.gz
@@ -42,6 +40,8 @@ Requires:	rrdtool >= 1.2
 #	Requires: perl-Net-DNS
 #	Requires: perl-SNMP_Session
 #	Requires: perl-ldap
+Provides:	user(%{name})
+Provides:	group(%{name})
 Suggests:	bind-utils
 Suggests:	curl
 Suggests:	echoping
@@ -138,40 +138,23 @@ install doc/*.7 $RPM_BUILD_ROOT%{_mandir}/man7
 %clean
 rm -rf $RPM_BUILD_ROOT
 
+%pre
+%groupadd -g 207 %{name}
+%useradd -u 207 -d /var/lib/%{name} -g %{name} -s /bin/false -c "Smokeping User" %{name}
+
 %post
-if [ "$1" = "1" ]; then
-
-firstgate=`route -n |awk '$1=="0.0.0.0" && $4 ~ /G/ {print $2}' | head -n 1`
-echo "
-+ gateway
- menu   = Default Gateway
- title  = Default Gateway Router
- host   = $firstgate
-
-+ dns
- menu   = DNS Servers
- title  = Domain Name Servers
-        " >> %{_sysconfdir}/config
-for dns in `awk '$1 ~ /^nameserver/ {print $2}' /etc/resolv.conf | LC_ALL=C sort -u` ; do
-dnscnt=$((dnscnt+1))
-echo "++ dns$dnscnt
-  menu  = DNS Server $dnscnt
-  title = Domain Name Server $dnscnt
-  host  = $dns
-        " >> %{_sysconfdir}/config
-done
-
-[ "$HOSTNAME" ] && %{__sed} -i -e "s|localhost|$HOSTNAME|g" %{_sysconfdir}/config
-
-fi
-
 /sbin/chkconfig --add %{name}
-%service %{name} restart
 
 %preun
 if [ "$1" = 0 ]; then
 	%service %{name} stop
 	/sbin/chkconfig --del %{name}
+fi
+
+%postun
+if [ "$1" = 0 ]; then
+	%userremove %{name}
+	%groupremove %{name}
 fi
 
 %triggerin cgi -- apache1 < 1.3.37-3, apache1-base
@@ -186,10 +169,10 @@ fi
 %triggerun cgi -- apache < 2.2.0, apache-base
 %webapp_unregister httpd %{_webapp}
 
-%triggerin -- lighttpd
+%triggerin cgi -- lighttpd
 %webapp_register lighttpd %{_webapp}
 
-%triggerun -- lighttpd
+%triggerun cgi -- lighttpd
 %webapp_unregister lighttpd %{_webapp}
 
 %triggerpostun -- %{name} < 2.0.5-0.3
@@ -233,7 +216,7 @@ EOF
 %config(noreplace) %verify(not md5 mtime size) %{_sysconfdir}/tmail
 %attr(754,root,root) /etc/rc.d/init.d/smokeping
 %dir %{_sharedstatedir}/%{name}
-%{_sharedstatedir}/%{name}/rrd
+%dir %attr(775,root,smokeping) %{_sharedstatedir}/%{name}/rrd
 %dir %attr(775,root,http) %{_sharedstatedir}/%{name}/img
 
 %files cgi
