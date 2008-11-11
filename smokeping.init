@@ -29,7 +29,7 @@ checkconfig() {
 start() {
 	if [ ! -f /var/lock/subsys/smokeping ]; then
 		msg_starting smokeping
-		daemon smokeping
+		daemon --user smokeping smokeping
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/smokeping
 	else
