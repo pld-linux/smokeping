@@ -25,17 +25,17 @@ Requires(post,preun):	/sbin/chkconfig
 Requires:	fping
 Requires:	rc-scripts
 Requires:	rrdtool >= 1.2
+Suggests:	perl(Authen::Radius)
+Suggests:	perl(Authen::TacacsPlus)
+Suggests:	perl(Net::DNS)
+Suggests:	perl(Net::LDAP)
+Suggests:	perl(Net::Telnet)
 # NOTE: these modules are optional, not required:
-#	Requires: perl(Authen::Radius)
-#	Requires: perl(Authen::TacacsPlus)
 #	Requires: perl(DBD::Pg)
 #	Requires: perl(DBI)
 #	Requires: perl(DB_File)
 #	Requires: perl(Digest::SHA1)
 #	Requires: perl(FreezeThaw)
-#	Requires: perl(Net::DNS)
-#	Requires: perl(Net::LDAP)
-#	Requires: perl(Net::Telnet)
 #	Requires: perl(URI::Escape)
 #	Requires: perl-Net-DNS
 #	Requires: perl-SNMP_Session
