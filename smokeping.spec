@@ -22,9 +22,9 @@ BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	sed >= 4.0
 Requires(post):	sed >= 4.0
 Requires(post,preun):	/sbin/chkconfig
-Requires:	fping
 Requires:	rc-scripts
 Requires:	rrdtool >= 1.2
+Suggests:	fping
 Suggests:	perl(Authen::Radius)
 Suggests:	perl(Authen::TacacsPlus)
 Suggests:	perl(Net::DNS)
@@ -144,6 +144,10 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 /sbin/chkconfig --add %{name}
+%banner -e %{name} << EOF
+fping probe (if used) needs smokeping user to be in adm group, e.g.
+	usermod -G adm smokeping
+EOF
 
 %preun
 if [ "$1" = 0 ]; then
