@@ -91,9 +91,7 @@ decruft /usr/sepp/bin %{_bindir}
 # rrdtool package goes into standard perl tree
 decruft '^use lib .*rrdtool.*;' ''
 
-# there's no SpeedyCGI for apache2? use regular perl...
-decruft /usr/bin/speedy-5.8.8 %{__perl}
-decruft /usr/bin/speedy %{__perl}
+decruft /usr/bin/speedy-5.8.8 /usr/bin/speedy
 
 sed -i -e '/\/home\/oposs\/smokeping\/software\/lib/d' htdocs/tr.cgi.dist
 sed -i -e '/\/home\/oetiker\/checkouts\/smokeping\/trunk\/software\/lib/d' htdocs/smokeping.cgi.dist
