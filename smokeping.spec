@@ -22,6 +22,7 @@ BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	sed >= 4.0
 Requires(post):	sed >= 4.0
 Requires(post,preun):	/sbin/chkconfig
+Requires(post):	findutils
 Requires:	rc-scripts
 Requires:	rrdtool >= 1.2
 Suggests:	fping
@@ -192,6 +193,10 @@ fi
 %banner -e %{name} << EOF
 The CGI program is available as %{name}-cgi package.
 EOF
+
+%triggerpostun -- %{name} < 2.4.2-3
+find /var/lib/smokeping/rrd -type f -user root -group root -name \*.rrd -mtime -7 -exec chown smokeping \{\} \;
+find /var/lib/smokeping/rrd -type d -user root -group root -exec chown smokeping \{\} \;
 
 %files
 %defattr(644,root,root,755)
