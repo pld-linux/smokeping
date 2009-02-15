@@ -29,7 +29,7 @@ checkconfig() {
 start() {
 	if [ ! -f /var/lock/subsys/smokeping ]; then
 		msg_starting smokeping
-		daemon --user smokeping smokeping
+		daemon --pidfile /var/run/smokeping/smokeping.pid --user smokeping smokeping
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/smokeping
 	else
@@ -40,7 +40,7 @@ start() {
 stop() {
 	if [ -f /var/lock/subsys/smokeping ]; then
 		msg_stopping smokeping
-		killproc smokeping
+		killproc --pidfile /var/run/smokeping/smokeping.pid smokeping
 		rm -f /var/lock/subsys/smokeping >/dev/null 2>&1
 	else
 		msg_not_running smokeping
@@ -50,13 +50,13 @@ stop() {
 RETVAL=0
 case "$1" in
   start)
-  	start
+	start
 	;;
   stop)
-  	stop
+	stop
 	;;
   restart|reload)
-  	checkconfig
+	checkconfig
 	stop
 	start
 	exit $?
