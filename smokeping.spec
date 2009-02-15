@@ -6,7 +6,7 @@ Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl.UTF-8):	Smokeping - narzędzie do tworzenia wykresów opóźnień sieci
 Name:		smokeping
 Version:	2.4.2
-Release:	3
+Release:	4
 License:	GPL v2+
 Group:		Networking/Utilities
 Source0:	http://oss.oetiker.ch/smokeping/pub/%{name}-%{version}.tar.gz
@@ -23,7 +23,7 @@ BuildRequires:	sed >= 4.0
 Requires(post):	sed >= 4.0
 Requires(post,preun):	/sbin/chkconfig
 Requires(post):	findutils
-Requires:	rc-scripts
+Requires:	rc-scripts >= 0.4.1.23
 Requires:	rrdtool >= 1.2
 Suggests:	fping
 Suggests:	perl(Authen::Radius)
@@ -112,7 +112,7 @@ sed -i -e 's#"cropper/#"/smokeping/cropper/#' etc/basepage.html.dist
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir},%{_wwwconfdir},%{_sbindir}} \
 	$RPM_BUILD_ROOT{%{_datadir}/%{name},%{_sharedstatedir}/%{name}/{img,rrd},%{_cgi_bindir}} \
-	$RPM_BUILD_ROOT%{_mandir}/man{1,3,5,7}
+	$RPM_BUILD_ROOT{%{_mandir}/man{1,3,5,7},/var/run/%{name}}
 
 install etc/basepage.html.dist $RPM_BUILD_ROOT%{_sysconfdir}/basepage.html
 install etc/config.dist $RPM_BUILD_ROOT%{_sysconfdir}
@@ -227,6 +227,7 @@ find /var/lib/smokeping/rrd -type d -user root -group root -exec chown smokeping
 %dir %{_sharedstatedir}/%{name}
 %dir %attr(775,root,smokeping) %{_sharedstatedir}/%{name}/rrd
 %dir %attr(775,root,http) %{_sharedstatedir}/%{name}/img
+%dir %attr(770,root,smokeping) /var/run/%{name}
 
 %files cgi
 %defattr(644,root,root,755)
