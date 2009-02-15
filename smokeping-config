@@ -9,7 +9,7 @@ imgurl   = /simg
 
 # daemon puts rrds in here
 datadir = /var/lib/smokeping/rrd
-piddir  = /var/run
+piddir  = /var/run/smokeping
 
 smokemail	= /etc/smokeping/smokemail
 cgiurl		= http://localhost/smokeping
