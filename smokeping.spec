@@ -143,10 +143,7 @@ rm -rf $RPM_BUILD_ROOT
 
 %post
 /sbin/chkconfig --add %{name}
-%banner -e %{name} << EOF
-fping probe (if used) needs smokeping user to be in adm group, e.g.
-	usermod -G adm smokeping
-EOF
+%addusertogroup smokeping adm
 
 %preun
 if [ "$1" = 0 ]; then
