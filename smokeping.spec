@@ -23,7 +23,7 @@ BuildRequires:	sed >= 4.0
 Requires(post):	sed >= 4.0
 Requires(post,preun):	/sbin/chkconfig
 Requires(post):	findutils
-Requires:	rc-scripts >= 0.4.1.23
+Requires:	rc-scripts
 Requires:	rrdtool >= 1.2
 Suggests:	fping
 Suggests:	perl(Authen::Radius)
