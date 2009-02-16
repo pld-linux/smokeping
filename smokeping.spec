@@ -22,7 +22,15 @@ BuildRequires:	rpmbuild(macros) >= 1.268
 BuildRequires:	sed >= 4.0
 Requires(post):	sed >= 4.0
 Requires(post,preun):	/sbin/chkconfig
-Requires(post):	findutils
+Requires(postun):	/usr/sbin/groupdel
+Requires(postun):	/usr/sbin/userdel
+Requires(pre):	/bin/id
+Requires(pre):	/usr/bin/getgid
+Requires(pre):	/usr/lib/rpm/user_group.sh
+Requires(pre):	/usr/sbin/groupadd
+Requires(pre):	/usr/sbin/useradd
+Requires(pre):	/usr/sbin/usermod
+Requires(triggerpostun):	findutils
 Requires:	rc-scripts
 Requires:	rrdtool >= 1.2
 Suggests:	fping
@@ -91,7 +99,7 @@ decruft /usr/sepp/bin %{_bindir}
 # rrdtool package goes into standard perl tree
 decruft '^use lib .*rrdtool.*;' ''
 
-decruft /usr/bin/speedy-5.8.8 /usr/bin/speedy
+decruft /usr/bin/speedy-5.8.8 %{_bindir}/speedy
 
 sed -i -e '/\/home\/oposs\/smokeping\/software\/lib/d' htdocs/tr.cgi.dist
 sed -i -e '/\/home\/oetiker\/checkouts\/smokeping\/trunk\/software\/lib/d' htdocs/smokeping.cgi.dist
@@ -140,10 +148,10 @@ rm -rf $RPM_BUILD_ROOT
 %pre
 %groupadd -g 207 %{name}
 %useradd -u 207 -d /var/lib/%{name} -g %{name} -s /bin/false -c "Smokeping User" %{name}
+%addusertogroup smokeping adm
 
 %post
 /sbin/chkconfig --add %{name}
-%addusertogroup smokeping adm
 
 %preun
 if [ "$1" = 0 ]; then
