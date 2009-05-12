@@ -1,0 +1,8 @@
+TODO
+* use .patch not decruft()
+* make separate packages for master-slave configuration
+  - common
+  - cgi - with cgi frontend (templates/ needed only by -cgi?)
+  - master - requires cgi and common
+  - slave - for pure slave
+
