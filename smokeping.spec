@@ -28,9 +28,9 @@ Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires(pre):	/usr/sbin/usermod
 Requires(triggerpostun):	findutils
-Requires:	echoping
 Requires:	rc-scripts >= 0.4.1.23
 Requires:	rrdtool >= 1.2
+Suggests:	echoping
 Suggests:	fping
 Suggests:	perl(Authen::Radius)
 Suggests:	perl(Authen::TacacsPlus)
