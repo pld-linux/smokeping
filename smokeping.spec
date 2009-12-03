@@ -1,3 +1,8 @@
+# TODO
+# - drop bogus provides: 
+#perl-Net-SNMP-5.2.0-1.noarch: required "perl(Digest::HMAC)" is provided by following packages:
+#a) perl-Digest-HMAC-1.01-12.noarch
+#b) smokeping-2.4.2-7.noarch
 %include	/usr/lib/rpm/macros.perl
 Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl.UTF-8):	Smokeping - narzędzie do tworzenia wykresów opóźnień sieci
@@ -16,6 +21,7 @@ URL:		http://oss.oetiker.ch/smokeping/
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.268
+BuildRequires:	bogus-dep-blocker
 BuildRequires:	sed >= 4.0
 Requires(post):	sed >= 4.0
 Requires(post,preun):	/sbin/chkconfig
