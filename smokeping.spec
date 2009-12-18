@@ -1,14 +1,9 @@
-# TODO
-# - drop bogus provides: 
-#perl-Net-SNMP-5.2.0-1.noarch: required "perl(Digest::HMAC)" is provided by following packages:
-#a) perl-Digest-HMAC-1.01-12.noarch
-#b) smokeping-2.4.2-7.noarch
 %include	/usr/lib/rpm/macros.perl
 Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl.UTF-8):	Smokeping - narzędzie do tworzenia wykresów opóźnień sieci
 Name:		smokeping
 Version:	2.4.2
-Release:	7
+Release:	8
 License:	GPL v2+
 Group:		Networking/Utilities
 Source0:	http://oss.oetiker.ch/smokeping/pub/%{name}-%{version}.tar.gz
@@ -21,7 +16,6 @@ URL:		http://oss.oetiker.ch/smokeping/
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.268
-BuildRequires:	bogus-dep-blocker
 BuildRequires:	sed >= 4.0
 Requires(post):	sed >= 4.0
 Requires(post,preun):	/sbin/chkconfig
@@ -36,32 +30,29 @@ Requires(pre):	/usr/sbin/usermod
 Requires(triggerpostun):	findutils
 Requires:	rc-scripts >= 0.4.1.23
 Requires:	rrdtool >= 1.2
-Suggests:	echoping
-Suggests:	fping
-Suggests:	perl(Authen::Radius)
-Suggests:	perl(Authen::TacacsPlus)
-Suggests:	perl(Net::DNS)
-Suggests:	perl(Net::LDAP)
-Suggests:	perl(Net::Telnet)
-# NOTE: these modules are optional, not required:
-#	Requires: perl(DBD::Pg)
-#	Requires: perl(DBI)
-#	Requires: perl(DB_File)
-#	Requires: perl(Digest::SHA1)
-#	Requires: perl(FreezeThaw)
-#	Requires: perl(URI::Escape)
-#	Requires: perl-Net-DNS
-#	Requires: perl-SNMP_Session
-#	Requires: perl-ldap
-Provides:	user(%{name})
-Provides:	group(%{name})
 Suggests:	bind-utils
 Suggests:	curl
 Suggests:	echoping
+Suggests:	echoping
+Suggests:	fping
 Suggests:	openssh-clients
 Suggests:	traceroute
+Provides:	group(%{name})
+Provides:	user(%{name})
 BuildArch:	noarch
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
+
+%define		_noautoprovfiles	%{_datadir}/%{name}
+%define		_noautoreq		perl(BER) perl(CGI::Session::Driver) perl(CGI::Session::Driver::DBI) perl(CGI::Session::ErrorHandler) perl(Config::Grammar) perl(Digest::HMAC) perl(Digest::HMAC_MD5) perl(JSON) perl(JSON::Converter) perl(JSON::Parser) perl(Smokeping::ciscoRttMonMIB) perl(Smokeping::Colorspace) perl(Smokeping::Config) perl(Smokeping::Examples) perl(Smokeping::Graphs) perl(Smokeping::Master) perl(Smokeping::matchers::Avgratio) perl(Smokeping::matchers::base) perl(Smokeping::probes::base) perl(Smokeping::probes::basefork) perl(Smokeping::probes::basevars) perl(Smokeping::probes::EchoPing) perl(Smokeping::probes::EchoPingHttp) perl(Smokeping::probes::EchoPingPlugin) perl(Smokeping::probes::FPing) perl(Smokeping::probes::passwordchecker) perl(Smokeping::RRDhelpers) perl(Smokeping::RRDtools) perl(Smokeping::Slave) perl(Smokeping::sorters::base) perl(SNMP_Session) perl(SNMP_util)
+
+# How to obtain _noautoreq:
+# 1. comment out _noauto* macros
+# 2. repackage smokeping
+# 3. select Provides from repackage output
+# 4. xclip -o | sed 's/ perl/\nperl/' > perlprov
+# 5. select Requires from repackage output
+# 6. xclip -o | sed 's/ perl/\nperl/' > perlreq
+# 7. cat perlprov perlreq | awk '{print $1}' | sort | uniq -c | grep '^      2 ' | awk '{print $2}' | tr '\n' ' '
 
 %define		_sysconfdir	/etc/%{name}
 %define		_webapps	/etc/webapps
