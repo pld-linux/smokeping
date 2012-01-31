@@ -12,6 +12,7 @@ Source1:	%{name}.init
 Source2:	%{name}.conf
 Source3:	%{name}-config
 Source4:	%{name}-lighttpd.conf
+Source5:	%{name}.tmpfiles
 URL:		http://oss.oetiker.ch/smokeping/
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpm-perlprov >= 4.1-13
@@ -113,7 +114,8 @@ sed -i -e 's#"cropper/#"/smokeping/cropper/#' etc/basepage.html.dist
 rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir},%{_wwwconfdir},%{_sbindir}} \
 	$RPM_BUILD_ROOT{%{_datadir}/%{name},%{_sharedstatedir}/%{name}/{img,rrd},%{_cgi_bindir}} \
-	$RPM_BUILD_ROOT{%{_mandir}/man{1,3,5,7},/var/run/%{name}}
+	$RPM_BUILD_ROOT{%{_mandir}/man{1,3,5,7},/var/run/%{name}} \
+	$RPM_BUILD_ROOT/usr/lib/tmpfiles.d
 
 install etc/basepage.html.dist $RPM_BUILD_ROOT%{_sysconfdir}/basepage.html
 install etc/config.dist $RPM_BUILD_ROOT%{_sysconfdir}
@@ -136,6 +138,8 @@ install doc/*.1 $RPM_BUILD_ROOT%{_mandir}/man1
 install doc/{,Config/,Smokeping/{,matchers/,probes/,sorters/}}*.3 $RPM_BUILD_ROOT%{_mandir}/man3
 install doc/*.5 $RPM_BUILD_ROOT%{_mandir}/man5
 install doc/*.7 $RPM_BUILD_ROOT%{_mandir}/man7
+
+install %{SOURCE5} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/%{name}.conf
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -226,6 +230,7 @@ find /var/lib/smokeping/rrd -type d -user root -group root -exec chown smokeping
 %dir %attr(775,root,smokeping) %{_sharedstatedir}/%{name}/rrd
 %dir %attr(775,root,http) %{_sharedstatedir}/%{name}/img
 %dir %attr(770,root,smokeping) /var/run/%{name}
+/usr/lib/tmpfiles.d/%{name}.conf
 
 %files cgi
 %defattr(644,root,root,755)
