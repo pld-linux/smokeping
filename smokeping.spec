@@ -77,6 +77,9 @@ Summary(pl.UTF-8):	Interfejs WWW (CGI) do smokepinga
 Group:		Applications/WWW
 Requires:	%{name} = %{version}-%{release}
 Requires:	webapps
+Requires:	webserver(access)
+Requires:	webserver(alias)
+Requires:	webserver(cgi)
 
 %description cgi
 CGI webinterface for smokeping.
