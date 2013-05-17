@@ -3,16 +3,17 @@ Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl.UTF-8):	Smokeping - narzędzie do tworzenia wykresów opóźnień sieci
 Name:		smokeping
 Version:	2.4.2
-Release:	10
+Release:	11
 License:	GPL v2+
 Group:		Networking/Utilities
 Source0:	http://oss.oetiker.ch/smokeping/pub/%{name}-%{version}.tar.gz
 # Source0-md5:	eb8e7679fcad35e59d7c51f2328250a2
 Source1:	%{name}.init
-Source2:	%{name}.conf
+Source2:	%{name}-apache.conf
 Source3:	%{name}-config
 Source4:	%{name}-lighttpd.conf
 Source5:	%{name}.tmpfiles
+Source6:	%{name}-httpd.conf
 URL:		http://oss.oetiker.ch/smokeping/
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpm-perlprov >= 4.1-13
@@ -80,6 +81,7 @@ Requires:	webapps
 Requires:	webserver(access)
 Requires:	webserver(alias)
 Requires:	webserver(cgi)
+Conflicts:	apache-base < 2.4.0-1
 
 %description cgi
 CGI webinterface for smokeping.
@@ -132,8 +134,8 @@ install htdocs/smokeping.cgi.dist $RPM_BUILD_ROOT%{_cgi_bindir}/smokeping.cgi
 install htdocs/tr.cgi.dist $RPM_BUILD_ROOT%{_cgi_bindir}/tr.cgi
 cp -r lib/* $RPM_BUILD_ROOT%{_datadir}/%{name}
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
-install %{SOURCE2} $RPM_BUILD_ROOT%{_wwwconfdir}/httpd.conf
 install %{SOURCE2} $RPM_BUILD_ROOT%{_wwwconfdir}/apache.conf
+install %{SOURCE6} $RPM_BUILD_ROOT%{_wwwconfdir}/httpd.conf
 install %{SOURCE4} $RPM_BUILD_ROOT%{_wwwconfdir}/lighttpd.conf
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/config
 install doc/*.1 $RPM_BUILD_ROOT%{_mandir}/man1
@@ -173,10 +175,10 @@ fi
 %triggerun cgi -- apache1 < 1.3.37-3, apache1-base
 %webapp_unregister apache %{_webapp}
 
-%triggerin cgi -- apache < 2.2.0, apache-base
+%triggerin cgi -- apache-base
 %webapp_register httpd %{_webapp}
 
-%triggerun cgi -- apache < 2.2.0, apache-base
+%triggerun cgi -- apache-base
 %webapp_unregister httpd %{_webapp}
 
 %triggerin cgi -- lighttpd
