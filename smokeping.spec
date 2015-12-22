@@ -7,7 +7,7 @@ Release:	0.2
 License:	GPL v2+
 Group:		Networking/Utilities
 Source0:	http://oss.oetiker.ch/smokeping/pub/%{name}-%{version}.tar.gz
-# Source0-md5:	eb8e7679fcad35e59d7c51f2328250a2
+# Source0-md5:	702392f5f3599f7eb1cc47eb2d192cb9
 Source1:	%{name}.init
 Source2:	%{name}-apache.conf
 Source3:	%{name}-config
