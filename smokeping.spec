@@ -2,8 +2,8 @@
 Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl.UTF-8):	Smokeping - narzędzie do tworzenia wykresów opóźnień sieci
 Name:		smokeping
-Version:	2.4.2
-Release:	12
+Version:	2.6.11
+Release:	0.2
 License:	GPL v2+
 Group:		Networking/Utilities
 Source0:	http://oss.oetiker.ch/smokeping/pub/%{name}-%{version}.tar.gz
@@ -14,6 +14,8 @@ Source3:	%{name}-config
 Source4:	%{name}-lighttpd.conf
 Source5:	%{name}.tmpfiles
 Source6:	%{name}-httpd.conf
+Patch0:     fix-paths.patch
+Patch1:     high_precision_sleep_timer.patch
 URL:		http://oss.oetiker.ch/smokeping/
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpm-perlprov >= 4.1-13
@@ -92,59 +94,49 @@ Interfejs WWW (CGI) do smokepinga.
 %prep
 %setup -q
 
-decruft() { grep -lr "$1" . | xargs %{__sed} -i -e "s|$1|$2|g"; }
+%patch0 -p1
+%patch1 -p1
 
-# eliminate Tobi's quirks
-decruft /usr/sepp/bin %{_bindir}
+#sed -i -e 's,^Net::.*$,,' PERL_MODULES
 
-# rrdtool package goes into standard perl tree
-decruft '^use lib .*rrdtool.*;' ''
-
-decruft /usr/bin/speedy-5.8.8 %{_bindir}/speedy
-
-sed -i -e '/\/home\/oposs\/smokeping\/software\/lib/d' htdocs/tr.cgi.dist
-sed -i -e '/\/home\/oetiker\/checkouts\/smokeping\/trunk\/software\/lib/d' htdocs/smokeping.cgi.dist
-sed -i -e 's|/home/oetiker/checkouts/smokeping/trunk/software/etc/config.dist|%{_sysconfdir}/config|' htdocs/smokeping.cgi.dist
-# working config in wrong location
-decruft "etc/config.dist" "%{_sysconfdir}/config"
-
-sed -i -e 's#use lib qw(lib);#use lib qw(%{_datadir}/%{name});#' bin/smokeping.dist
-
-sed -i -e 's#"cropper/#"/smokeping/cropper/#' etc/basepage.html.dist
+sed -i -e 's#@prefix@/etc/\(.*\).dist#/etc/smokeping/\1#' etc/config.dist.in
+sed -i -e 's#@prefix@/etc/#/etc/smokeping/#' etc/config.dist.in
 
 %build
+%configure
 %{__make}
 
 %install
 rm -rf $RPM_BUILD_ROOT
-install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir},%{_wwwconfdir},%{_sbindir}} \
+install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir},%{_wwwconfdir}} \
 	$RPM_BUILD_ROOT{%{_datadir}/%{name},%{_sharedstatedir}/%{name}/{img,rrd},%{_cgi_bindir}} \
 	$RPM_BUILD_ROOT{%{_mandir}/man{1,3,5,7},/var/run/%{name}} \
 	$RPM_BUILD_ROOT/usr/lib/tmpfiles.d
 
-install etc/basepage.html.dist $RPM_BUILD_ROOT%{_sysconfdir}/basepage.html
-install etc/config.dist $RPM_BUILD_ROOT%{_sysconfdir}
-install etc/smokemail.dist $RPM_BUILD_ROOT%{_sysconfdir}/smokemail
-install etc/smokeping_secrets.dist $RPM_BUILD_ROOT%{_sysconfdir}/smokeping_secrets
-install etc/tmail.dist $RPM_BUILD_ROOT%{_sysconfdir}/tmail
-install bin/smokeping.dist $RPM_BUILD_ROOT%{_sbindir}/smokeping
-install bin/tSmoke.dist $RPM_BUILD_ROOT%{_sbindir}/tSmoke
-cp -r htdocs/{cropper,resource,script,tr.html} $RPM_BUILD_ROOT%{_cgi_bindir}
-install htdocs/smokeping.cgi.dist $RPM_BUILD_ROOT%{_cgi_bindir}/smokeping.cgi
-install htdocs/tr.cgi.dist $RPM_BUILD_ROOT%{_cgi_bindir}/tr.cgi
-cp -r lib/* $RPM_BUILD_ROOT%{_datadir}/%{name}
+%{__make} install DESTDIR=$RPM_BUILD_ROOT
+
+# start of fixing paths
+for f in basepage.html smokemail smokeping_secrets tmail; do
+    mv $RPM_BUILD_ROOT/etc/smokeping/{$f.dist,$f}
+done
+
+rm -rf $RPM_BUILD_ROOT/etc/smokeping/examples
+
+mv $RPM_BUILD_ROOT/usr/lib/{*.pm,Smokeping} $RPM_BUILD_ROOT%{_datadir}/%{name}
+
+mv $RPM_BUILD_ROOT{/usr/htdocs/cropper,%{_cgi_bindir}}
+mv $RPM_BUILD_ROOT%{_bindir}/smokeping_cgi $RPM_BUILD_ROOT%{_cgi_bindir}/smokeping.cgi
+
+mv $RPM_BUILD_ROOT%{_mandir}/man1/{smokeping_cgi.1,smokeping.cgi.1}
+# end of fixing paths
+
 install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 install %{SOURCE2} $RPM_BUILD_ROOT%{_wwwconfdir}/apache.conf
 install %{SOURCE6} $RPM_BUILD_ROOT%{_wwwconfdir}/httpd.conf
 install %{SOURCE4} $RPM_BUILD_ROOT%{_wwwconfdir}/lighttpd.conf
 install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/config
-install doc/*.1 $RPM_BUILD_ROOT%{_mandir}/man1
-# TODO: man(3) pages from subdirectories are packaged in %_docdir too, clean them up
-install doc/{,Config/,Smokeping/{,matchers/,probes/,sorters/}}*.3 $RPM_BUILD_ROOT%{_mandir}/man3
-install doc/*.5 $RPM_BUILD_ROOT%{_mandir}/man5
-install doc/*.7 $RPM_BUILD_ROOT%{_mandir}/man7
-
 install %{SOURCE5} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/%{name}.conf
+
 
 %clean
 rm -rf $RPM_BUILD_ROOT
@@ -207,16 +199,13 @@ find /var/lib/smokeping/rrd -type d -user root -group root -exec chown smokeping
 
 %files
 %defattr(644,root,root,755)
-%doc CHANGES CONTRIBUTORS COPYRIGHT README TODO doc/*.html doc/*.txt doc/Config doc/Smokeping doc/examples
-%attr(755,root,root) %{_sbindir}/smokeping
-%attr(755,root,root) %{_sbindir}/tSmoke
+%doc CHANGES CONTRIBUTORS COPYRIGHT README TODO doc/*.txt doc/examples
+%attr(755,root,root) %{_bindir}/smokeinfo
+%attr(755,root,root) %{_bindir}/smokeping
+%attr(755,root,root) %{_bindir}/tSmoke
 %{_datadir}/smokeping
 %exclude %{_cgi_bindir}/cropper
-%exclude %{_datadir}/smokeping/smokeping.cgi
-%exclude %{_cgi_bindir}/resource
-%exclude %{_cgi_bindir}/script
-%exclude %{_datadir}/smokeping/tr.cgi
-%exclude %{_datadir}/smokeping/tr.html
+%exclude %{_datadir}/smokeping/smokeping.*cgi
 %{_mandir}/man1/smokeping.1*
 %{_mandir}/man1/smokeping.cgi.1*
 %{_mandir}/man1/tSmoke.1*
@@ -245,7 +234,3 @@ find /var/lib/smokeping/rrd -type d -user root -group root -exec chown smokeping
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/lighttpd.conf
 %{_cgi_bindir}/cropper
 %attr(755,root,root) %{_cgi_bindir}/smokeping.cgi
-%{_cgi_bindir}/resource
-%{_cgi_bindir}/script
-%attr(755,root,root) %{_cgi_bindir}/tr.cgi
-%{_cgi_bindir}/tr.html

@@ -23,13 +23,13 @@ else
 fi
 
 checkconfig() {
-	/usr/sbin/smokeping --check || exit 1
+	/usr/bin/smokeping --check || exit 1
 }
 
 start() {
 	if [ ! -f /var/lock/subsys/smokeping ]; then
 		msg_starting smokeping
-		daemon --pidfile /var/run/smokeping/smokeping.pid --user smokeping /usr/sbin/smokeping
+		daemon --pidfile /var/run/smokeping/smokeping.pid --user smokeping /usr/bin/smokeping
 		RETVAL=$?
 		[ $RETVAL -eq 0 ] && touch /var/lock/subsys/smokeping
 	else

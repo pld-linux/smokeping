@@ -1,0 +1,142 @@
+diff -urN smokeping-2.6.11.orig/doc/smokeping_install.pod smokeping-2.6.11/doc/smokeping_install.pod
+--- smokeping-2.6.11.orig/doc/smokeping_install.pod	2013-11-14 10:42:22.000000000 +0100
++++ smokeping-2.6.11/doc/smokeping_install.pod	2015-12-17 11:48:24.203504524 +0100
+@@ -152,7 +152,7 @@
+ 
+ =head2 Configuration
+ 
+-Use the F<etc/config.dist> file as a template to create your own smokeping configuration file.
++Use the F</etc/smokeping/config> file as a template to create your own smokeping configuration file.
+ See L<smokeping_config> for details.
+ 
+ =over
+diff -urN smokeping-2.6.11.orig/etc/basepage.html.dist smokeping-2.6.11/etc/basepage.html.dist
+--- smokeping-2.6.11.orig/etc/basepage.html.dist	2012-04-02 09:20:35.000000000 +0200
++++ smokeping-2.6.11/etc/basepage.html.dist	2015-12-17 11:48:24.211504620 +0100
+@@ -53,10 +53,10 @@
+ -->
+ </STYLE>
+ 
+-<script src="cropper/lib/prototype.js" type="text/javascript"></script>      
+-<script src="cropper/lib/scriptaculous.js?load=builder,effects,dragdrop" type="text/javascript"></script>
+-<script src="cropper/cropper.js" type="text/javascript"></script>
+-<script src="cropper/smokeping-zoom.js" type="text/javascript"></script>
++<script src="/smokeping/cropper/lib/prototype.js" type="text/javascript"></script>      
++<script src="/smokeping/cropper/lib/scriptaculous.js?load=builder,effects,dragdrop" type="text/javascript"></script>
++<script src="/smokeping/cropper/cropper.js" type="text/javascript"></script>
++<script src="/smokeping/cropper/smokeping-zoom.js" type="text/javascript"></script>
+ 
+ 
+ 
+diff -urN smokeping-2.6.11.orig/lib/Smokeping/Examples.pm smokeping-2.6.11/lib/Smokeping/Examples.pm
+--- smokeping-2.6.11.orig/lib/Smokeping/Examples.pm	2011-10-05 11:51:46.000000000 +0200
++++ smokeping-2.6.11/lib/Smokeping/Examples.pm	2015-12-17 11:48:24.208504584 +0100
+@@ -12,7 +12,7 @@
+ This module generates L<smokeping_examples> and the example
+ configuration files distributed with Smokeping. It is supposed to be
+ invoked from the smokeping distribution top directory, as it will need
+-the C<etc/config.dist> template configuration file and will create files
++the C</etc/smokeping/config> template configuration file and will create files
+ in the directories C<doc> and C<doc/examples>.
+ 
+ =head1 DESCRIPTION
+@@ -107,7 +107,7 @@
+ ${e}head1 DESCRIPTION
+ 
+ Currently the examples differ only in the C<Probes> and C<Targets>
+-sections. The other sections are taken from the C<etc/config.dist>
++sections. The other sections are taken from the C</etc/smokeping/config>
+ configuration template in the Smokeping distribution so that the example
+ files are complete.
+ 
+diff -urN smokeping-2.6.11.orig/lib/Smokeping.pm smokeping-2.6.11/lib/Smokeping.pm
+--- smokeping-2.6.11.orig/lib/Smokeping.pm	2014-11-04 23:56:29.000000000 +0100
++++ smokeping-2.6.11/lib/Smokeping.pm	2015-12-17 11:48:24.194504417 +0100
+@@ -3526,7 +3526,7 @@
+ 
+  *** Probes ***
+  +FPing
+- binary = /usr/sepp/bin/fping
++ binary = /usr/bin/fping
+ 
+ You can override it for a particular slave like this:
+ 
+--- smokeping-2.6.11.orig/bin/smokeping	2011-10-05 11:51:46.000000000 +0200
++++ smokeping-2.6.11/bin/smokeping	2015-12-22 10:41:23.876468254 +0100
+@@ -4,14 +4,11 @@
+ use strict;
+ use warnings;
+ 
+-use FindBin;
+-# PERL5LIB
+-use lib "$FindBin::Bin/../thirdparty/lib/perl5";
+-use lib "$FindBin::Bin/../lib";
++use lib "/usr/share/smokeping";
+ 
+ use Smokeping;
+  
+-Smokeping::main("$FindBin::Bin/../etc/config");
++Smokeping::main("/etc/smokeping/config");
+ 
+ =head1 NAME
+ 
+--- smokeping-2.6.11.orig/bin/tSmoke	2011-10-05 11:51:46.000000000 +0200
++++ smokeping-2.6.11/bin/tSmoke	2015-12-22 10:44:19.154562257 +0100
+@@ -51,10 +51,7 @@
+ # -- Getopt::Long
+ #
+ # Point the lib variables to your implementation
+-use FindBin;
+-# PERL5LIB
+-use lib "$FindBin::Bin/../thirdparty/lib/perl5";
+-use lib "$FindBin::Bin/../lib";
++use lib "/usr/share/smokeping";
+ 
+ use Smokeping;
+ use Net::SMTP;
+@@ -63,7 +60,7 @@
+ use RRDs;
+ 
+ # Point to your Smokeping config file
+-my $cfgfile = "etc/config.dist";
++my $cfgfile = "/etc/smokeping/config";
+ 
+ # global variables
+ my $cfg;
+--- smokeping-2.6.11.orig/bin/smokeping_cgi	2011-10-05 11:51:46.000000000 +0200
++++ smokeping-2.6.11/bin/smokeping_cgi	2015-12-22 10:45:24.548343500 +0100
+@@ -4,10 +4,7 @@
+ use strict;
+ use warnings;
+ 
+-use FindBin;
+-# PERL5LIB
+-use lib "$FindBin::Bin/../thirdparty/lib/perl5";
+-use lib "$FindBin::Bin/../lib";
++use lib "/usr/share/smokeping";
+ 
+ # don't bother with zombies
+ $SIG{CHLD} = 'IGNORE';
+@@ -18,7 +15,7 @@
+ 
+ use CGI::Fast;
+ 
+-my $cfg = (shift @ARGV) || "$FindBin::Bin/../etc/config";
++my $cfg = (shift @ARGV) || "/etc/smokeping/config";
+ 
+ 
+ while (my $q = new CGI::Fast) {
+--- smokeping-2.6.11.orig/bin/smokeinfo	2012-07-03 22:37:04.000000000 +0200
++++ smokeping-2.6.11/bin/smokeinfo	2015-12-22 10:46:30.982137167 +0100
+@@ -2,10 +2,7 @@
+ use strict;
+ use warnings;
+ 
+-use FindBin;
+-# PERL5LIB
+-use lib "$FindBin::Bin/../thirdparty/lib/perl5";
+-use lib "$FindBin::Bin/../lib";
++use lib "/usr/share/smokeping";
+ 
+ use Smokeping::Info;
+ use Getopt::Long 2.25 qw(:config no_ignore_case);
