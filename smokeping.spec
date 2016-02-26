@@ -14,8 +14,8 @@ Source3:	%{name}-config
 Source4:	%{name}-lighttpd.conf
 Source5:	%{name}.tmpfiles
 Source6:	%{name}-httpd.conf
-Patch0:     fix-paths.patch
-Patch1:     high_precision_sleep_timer.patch
+Patch0:		fix-paths.patch
+Patch1:		high_precision_sleep_timer.patch
 URL:		http://oss.oetiker.ch/smokeping/
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpm-perlprov >= 4.1-13
@@ -111,7 +111,7 @@ rm -rf $RPM_BUILD_ROOT
 install -d $RPM_BUILD_ROOT{/etc/rc.d/init.d,%{_sysconfdir},%{_wwwconfdir}} \
 	$RPM_BUILD_ROOT{%{_datadir}/%{name},%{_sharedstatedir}/%{name}/{img,rrd},%{_cgi_bindir}} \
 	$RPM_BUILD_ROOT{%{_mandir}/man{1,3,5,7},/var/run/%{name}} \
-	$RPM_BUILD_ROOT/usr/lib/tmpfiles.d
+	$RPM_BUILD_ROOT%{systemdtmpfilesdir}
 
 %{__make} install DESTDIR=$RPM_BUILD_ROOT
 
@@ -122,20 +122,20 @@ done
 
 rm -rf $RPM_BUILD_ROOT/etc/smokeping/examples
 
-mv $RPM_BUILD_ROOT/usr/lib/{*.pm,Smokeping} $RPM_BUILD_ROOT%{_datadir}/%{name}
+mv $RPM_BUILD_ROOT%{_prefix}/lib/{*.pm,Smokeping} $RPM_BUILD_ROOT%{_datadir}/%{name}
 
-mv $RPM_BUILD_ROOT{/usr/htdocs/cropper,%{_cgi_bindir}}
+mv $RPM_BUILD_ROOT{%{_prefix}/htdocs/cropper,%{_cgi_bindir}}
 mv $RPM_BUILD_ROOT%{_bindir}/smokeping_cgi $RPM_BUILD_ROOT%{_cgi_bindir}/smokeping.cgi
 
 mv $RPM_BUILD_ROOT%{_mandir}/man1/{smokeping_cgi.1,smokeping.cgi.1}
 # end of fixing paths
 
-install %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
-install %{SOURCE2} $RPM_BUILD_ROOT%{_wwwconfdir}/apache.conf
-install %{SOURCE6} $RPM_BUILD_ROOT%{_wwwconfdir}/httpd.conf
-install %{SOURCE4} $RPM_BUILD_ROOT%{_wwwconfdir}/lighttpd.conf
-install %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/config
-install %{SOURCE5} $RPM_BUILD_ROOT/usr/lib/tmpfiles.d/%{name}.conf
+cp -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
+cp -p %{SOURCE2} $RPM_BUILD_ROOT%{_wwwconfdir}/apache.conf
+cp -p %{SOURCE6} $RPM_BUILD_ROOT%{_wwwconfdir}/httpd.conf
+cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_wwwconfdir}/lighttpd.conf
+cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/config
+cp -p %{SOURCE5} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
 
 
 %clean
@@ -224,7 +224,7 @@ find /var/lib/smokeping/rrd -type d -user root -group root -exec chown smokeping
 %dir %attr(775,root,smokeping) %{_sharedstatedir}/%{name}/rrd
 %dir %attr(775,root,http) %{_sharedstatedir}/%{name}/img
 %dir %attr(770,root,smokeping) /var/run/%{name}
-/usr/lib/tmpfiles.d/%{name}.conf
+%{systemdtmpfilesdir}/%{name}.conf
 
 %files cgi
 %defattr(644,root,root,755)
