@@ -103,7 +103,8 @@ sed -i -e 's#@prefix@/etc/\(.*\).dist#/etc/smokeping/\1#' etc/config.dist.in
 sed -i -e 's#@prefix@/etc/#/etc/smokeping/#' etc/config.dist.in
 
 %build
-%configure
+%configure \
+	--enable-pkgonly
 %{__make}
 
 %install
