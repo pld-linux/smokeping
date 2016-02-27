@@ -17,6 +17,8 @@ Source6:	%{name}-httpd.conf
 Patch0:		fix-paths.patch
 Patch1:		high_precision_sleep_timer.patch
 URL:		http://oss.oetiker.ch/smokeping/
+BuildRequires:	perl-Config-Grammar
+BuildRequires:	perl-rrdtool
 BuildRequires:	perl-tools-pod
 BuildRequires:	rpm-perlprov >= 4.1-13
 BuildRequires:	rpmbuild(macros) >= 1.268
