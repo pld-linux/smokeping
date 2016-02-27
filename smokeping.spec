@@ -39,7 +39,6 @@ Requires:	rrdtool >= 1.2
 Suggests:	bind-utils
 Suggests:	curl
 Suggests:	echoping
-Suggests:	echoping
 Suggests:	fping
 Suggests:	openssh-clients
 Suggests:	traceroute
