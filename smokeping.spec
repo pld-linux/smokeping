@@ -58,7 +58,8 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 # 4. xclip -o | sed 's/ perl/\nperl/g' | awk '{print $1}' | sort -u > perlprov
 # 5. select Requires from repackage output
 # 6. xclip -o | sed 's/ perl/\nperl/g' | awk '{print $1}' | sort -u > perlreq
-# 7. cat perlprov perlprov perlreq | awk '{print $1}' | sort | uniq -c | grep '^      2 ' | awk '{print $2}' | tr '\n' ' '
+# 7. cat perlprov perlprov perlreq | awk '{print $1}' | sort | uniq -c | \
+#      grep '^      2 ' | sed 's/.*perl(//; s/)//' | tr '\n' ' '
 
 %define		_sysconfdir	/etc/%{name}
 %define		_webapps	/etc/webapps
