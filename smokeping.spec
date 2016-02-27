@@ -55,10 +55,10 @@ BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 # 1. comment out _noauto* macros
 # 2. repackage smokeping
 # 3. select Provides from repackage output
-# 4. xclip -o | sed 's/ perl/\nperl/' > perlprov
+# 4. xclip -o | sed 's/ perl/\nperl/g' | awk '{print $1}' | sort -u > perlprov
 # 5. select Requires from repackage output
-# 6. xclip -o | sed 's/ perl/\nperl/' > perlreq
-# 7. cat perlprov perlreq | awk '{print $1}' | sort | uniq -c | grep '^      2 ' | awk '{print $2}' | tr '\n' ' '
+# 6. xclip -o | sed 's/ perl/\nperl/g' | awk '{print $1}' | sort -u > perlreq
+# 7. cat perlprov perlprov perlreq | awk '{print $1}' | sort | uniq -c | grep '^      2 ' | awk '{print $2}' | tr '\n' ' '
 
 %define		_sysconfdir	/etc/%{name}
 %define		_webapps	/etc/webapps
