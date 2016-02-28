@@ -134,13 +134,12 @@ mv $RPM_BUILD_ROOT%{_bindir}/smokeping_cgi $RPM_BUILD_ROOT%{_cgi_bindir}/smokepi
 mv $RPM_BUILD_ROOT%{_mandir}/man1/{smokeping_cgi.1,smokeping.cgi.1}
 # end of fixing paths
 
-cp -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
+install -p %{SOURCE1} $RPM_BUILD_ROOT/etc/rc.d/init.d/%{name}
 cp -p %{SOURCE2} $RPM_BUILD_ROOT%{_wwwconfdir}/apache.conf
 cp -p %{SOURCE6} $RPM_BUILD_ROOT%{_wwwconfdir}/httpd.conf
 cp -p %{SOURCE4} $RPM_BUILD_ROOT%{_wwwconfdir}/lighttpd.conf
 cp -p %{SOURCE3} $RPM_BUILD_ROOT%{_sysconfdir}/config
 cp -p %{SOURCE5} $RPM_BUILD_ROOT%{systemdtmpfilesdir}/%{name}.conf
-
 
 %clean
 rm -rf $RPM_BUILD_ROOT
