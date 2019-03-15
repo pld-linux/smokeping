@@ -2,12 +2,12 @@
 Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl.UTF-8):	Smokeping - narzędzie do tworzenia wykresów opóźnień sieci
 Name:		smokeping
-Version:	2.6.11
-Release:	3
+Version:	2.7.3
+Release:	1
 License:	GPL v2+
 Group:		Networking/Utilities
 Source0:	http://oss.oetiker.ch/smokeping/pub/%{name}-%{version}.tar.gz
-# Source0-md5:	702392f5f3599f7eb1cc47eb2d192cb9
+# Source0-md5:	e0a8657241182f6c8bdb91cfca2589c7
 Source1:	%{name}.init
 Source2:	%{name}-apache.conf
 Source3:	%{name}-config
@@ -15,8 +15,10 @@ Source4:	%{name}-lighttpd.conf
 Source5:	%{name}.tmpfiles
 Source6:	%{name}-httpd.conf
 Patch0:		fix-paths.patch
-Patch1:		high_precision_sleep_timer.patch
+Patch1:		no-thirdparty.patch
 URL:		http://oss.oetiker.ch/smokeping/
+BuildRequires:	autoconf
+BuildRequires:	automake
 BuildRequires:	perl-Config-Grammar
 BuildRequires:	perl-rrdtool
 BuildRequires:	perl-tools-pod
@@ -106,6 +108,10 @@ sed -i -e 's#@prefix@/etc/\(.*\).dist#/etc/smokeping/\1#' etc/config.dist.in
 sed -i -e 's#@prefix@/etc/#/etc/smokeping/#' etc/config.dist.in
 
 %build
+[ ! -f VERSION ] && echo %{version} > VERSION
+%{__aclocal}
+%{__autoconf}
+%{__automake}
 %configure \
 	--enable-pkgonly
 %{__make}
@@ -128,7 +134,7 @@ rm -rf $RPM_BUILD_ROOT/etc/smokeping/examples
 
 mv $RPM_BUILD_ROOT%{_prefix}/lib/{*.pm,Smokeping} $RPM_BUILD_ROOT%{_datadir}/%{name}
 
-mv $RPM_BUILD_ROOT{%{_prefix}/htdocs/cropper,%{_cgi_bindir}}
+mv $RPM_BUILD_ROOT{%{_prefix}/htdocs/{css,js},%{_cgi_bindir}}
 mv $RPM_BUILD_ROOT%{_bindir}/smokeping_cgi $RPM_BUILD_ROOT%{_cgi_bindir}/smokeping.cgi
 
 mv $RPM_BUILD_ROOT%{_mandir}/man1/{smokeping_cgi.1,smokeping.cgi.1}
@@ -207,7 +213,8 @@ find /var/lib/smokeping/rrd -type d -user root -group root -exec chown smokeping
 %attr(755,root,root) %{_bindir}/smokeping
 %attr(755,root,root) %{_bindir}/tSmoke
 %{_datadir}/smokeping
-%exclude %{_cgi_bindir}/cropper
+%exclude %{_cgi_bindir}/css
+%exclude %{_cgi_bindir}/js
 %exclude %{_datadir}/smokeping/smokeping.*cgi
 %{_mandir}/man1/smokeping.1*
 %{_mandir}/man1/smokeping.cgi.1*
@@ -235,5 +242,6 @@ find /var/lib/smokeping/rrd -type d -user root -group root -exec chown smokeping
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/apache.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/httpd.conf
 %attr(640,root,root) %config(noreplace) %verify(not md5 mtime size) %{_wwwconfdir}/lighttpd.conf
-%{_cgi_bindir}/cropper
+%{_cgi_bindir}/css
+%{_cgi_bindir}/js
 %attr(755,root,root) %{_cgi_bindir}/smokeping.cgi
