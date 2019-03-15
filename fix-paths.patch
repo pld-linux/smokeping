@@ -1,6 +1,6 @@
 diff -urN smokeping-2.7.3.org/bin/smokeinfo smokeping-2.7.3/bin/smokeinfo
 --- smokeping-2.7.3.org/bin/smokeinfo	2018-04-13 14:13:05.000000000 +0200
-+++ smokeping-2.7.3/bin/smokeinfo	2019-03-15 09:15:16.281298555 +0100
++++ smokeping-2.7.3/bin/smokeinfo	2019-03-15 09:59:38.301385321 +0100
 @@ -2,8 +2,7 @@
  use strict;
  use warnings;
@@ -13,7 +13,7 @@ diff -urN smokeping-2.7.3.org/bin/smokeinfo smokeping-2.7.3/bin/smokeinfo
  use Getopt::Long 2.25 qw(:config no_ignore_case);
 diff -urN smokeping-2.7.3.org/bin/smokeping smokeping-2.7.3/bin/smokeping
 --- smokeping-2.7.3.org/bin/smokeping	2018-04-13 14:13:05.000000000 +0200
-+++ smokeping-2.7.3/bin/smokeping	2019-03-15 09:13:44.808555196 +0100
++++ smokeping-2.7.3/bin/smokeping	2019-03-15 09:59:38.301385321 +0100
 @@ -4,13 +4,11 @@
  use strict;
  use warnings;
@@ -32,7 +32,7 @@ diff -urN smokeping-2.7.3.org/bin/smokeping smokeping-2.7.3/bin/smokeping
  
 diff -urN smokeping-2.7.3.org/bin/smokeping_cgi smokeping-2.7.3/bin/smokeping_cgi
 --- smokeping-2.7.3.org/bin/smokeping_cgi	2018-04-13 14:13:05.000000000 +0200
-+++ smokeping-2.7.3/bin/smokeping_cgi	2019-03-15 09:14:55.490675372 +0100
++++ smokeping-2.7.3/bin/smokeping_cgi	2019-03-15 09:59:38.304718754 +0100
 @@ -4,9 +4,7 @@
  use strict;
  use warnings;
@@ -56,7 +56,7 @@ diff -urN smokeping-2.7.3.org/bin/smokeping_cgi smokeping-2.7.3/bin/smokeping_cg
     Smokeping::cgi($cfg,$q);
 diff -urN smokeping-2.7.3.org/bin/tSmoke smokeping-2.7.3/bin/tSmoke
 --- smokeping-2.7.3.org/bin/tSmoke	2018-04-13 14:13:05.000000000 +0200
-+++ smokeping-2.7.3/bin/tSmoke	2019-03-15 09:14:23.476382053 +0100
++++ smokeping-2.7.3/bin/tSmoke	2019-03-15 09:59:38.304718754 +0100
 @@ -52,9 +52,7 @@
  #
  # Point the lib variables to your implementation
@@ -79,7 +79,7 @@ diff -urN smokeping-2.7.3.org/bin/tSmoke smokeping-2.7.3/bin/tSmoke
  my $cfg;
 diff -urN smokeping-2.7.3.org/doc/smokeping_install.pod smokeping-2.7.3/doc/smokeping_install.pod
 --- smokeping-2.7.3.org/doc/smokeping_install.pod	2018-01-30 21:40:07.000000000 +0100
-+++ smokeping-2.7.3/doc/smokeping_install.pod	2019-03-15 09:11:30.687864995 +0100
++++ smokeping-2.7.3/doc/smokeping_install.pod	2019-03-15 09:59:38.304718754 +0100
 @@ -108,7 +108,7 @@
  
  =head2 Configuration
@@ -89,9 +89,38 @@ diff -urN smokeping-2.7.3.org/doc/smokeping_install.pod smokeping-2.7.3/doc/smok
  See L<smokeping_config> for details.
  
  =over
+diff -urN smokeping-2.7.3.org/etc/basepage.html.dist smokeping-2.7.3/etc/basepage.html.dist
+--- smokeping-2.7.3.org/etc/basepage.html.dist	2017-06-25 20:18:25.000000000 +0200
++++ smokeping-2.7.3/etc/basepage.html.dist	2019-03-15 10:00:33.033019175 +0100
+@@ -4,8 +4,8 @@
+     <meta name="viewport" content="width=device-width, initial-scale=1">
+     <META http-equiv="Refresh" content="<##step##>">
+     <title>SmokePing Latency Page for <##title##></title>
+-    <link rel="stylesheet" type="text/css" href="css/smokeping-print.css" media="print">
+-    <link rel="stylesheet" type="text/css" href="css/smokeping-screen.css" media="screen">
++    <link rel="stylesheet" type="text/css" href="/smokeping/css/smokeping-print.css" media="print">
++    <link rel="stylesheet" type="text/css" href="/smokeping/css/smokeping-screen.css" media="screen">
+ </head>
+ <body id="body">
+ 
+@@ -47,10 +47,10 @@
+     <p><small>Maintained by <a href="mailto:<##contact##>"><##owner##></a></small></p>
+ </div>
+ 
+-<script src="js/prototype.js" type="text/javascript"></script>
+-<script src="js/scriptaculous/scriptaculous.js?load=builder,effects,dragdrop" type="text/javascript"></script>
+-<script src="js/cropper/cropper.js" type="text/javascript"></script>
+-<script src="js/smokeping.js" type="text/javascript"></script>
++<script src="/smokeping/js/prototype.js" type="text/javascript"></script>
++<script src="/smokeping/js/scriptaculous/scriptaculous.js?load=builder,effects,dragdrop" type="text/javascript"></script>
++<script src="/smokeping/js/cropper/cropper.js" type="text/javascript"></script>
++<script src="/smokeping/js/smokeping.js" type="text/javascript"></script>
+ 
+ </body>
+ </html>
 diff -urN smokeping-2.7.3.org/lib/Smokeping/Examples.pm smokeping-2.7.3/lib/Smokeping/Examples.pm
 --- smokeping-2.7.3.org/lib/Smokeping/Examples.pm	2011-10-05 11:51:46.000000000 +0200
-+++ smokeping-2.7.3/lib/Smokeping/Examples.pm	2019-03-15 09:11:30.687864995 +0100
++++ smokeping-2.7.3/lib/Smokeping/Examples.pm	2019-03-15 09:59:38.304718754 +0100
 @@ -12,7 +12,7 @@
  This module generates L<smokeping_examples> and the example
  configuration files distributed with Smokeping. It is supposed to be
@@ -112,7 +141,7 @@ diff -urN smokeping-2.7.3.org/lib/Smokeping/Examples.pm smokeping-2.7.3/lib/Smok
  
 diff -urN smokeping-2.7.3.org/lib/Smokeping.pm smokeping-2.7.3/lib/Smokeping.pm
 --- smokeping-2.7.3.org/lib/Smokeping.pm	2018-12-20 11:24:44.000000000 +0100
-+++ smokeping-2.7.3/lib/Smokeping.pm	2019-03-15 09:13:01.330584016 +0100
++++ smokeping-2.7.3/lib/Smokeping.pm	2019-03-15 09:59:38.304718754 +0100
 @@ -3620,7 +3620,7 @@
  
   *** Probes ***
