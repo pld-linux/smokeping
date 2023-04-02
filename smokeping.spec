@@ -1,12 +1,12 @@
 Summary:	Smokeping - a latency grapher that uses rrdtool
 Summary(pl.UTF-8):	Smokeping - narzędzie do tworzenia wykresów opóźnień sieci
 Name:		smokeping
-Version:	2.7.3
-Release:	3
+Version:	2.8.2
+Release:	1
 License:	GPL v2+
 Group:		Networking/Utilities
 Source0:	http://oss.oetiker.ch/smokeping/pub/%{name}-%{version}.tar.gz
-# Source0-md5:	e0a8657241182f6c8bdb91cfca2589c7
+# Source0-md5:	cce2bf3f59736ecf77e59d64db60e3fb
 Source1:	%{name}.init
 Source2:	%{name}-apache.conf
 Source3:	%{name}-config
@@ -34,7 +34,7 @@ Requires(pre):	/usr/lib/rpm/user_group.sh
 Requires(pre):	/usr/sbin/groupadd
 Requires(pre):	/usr/sbin/useradd
 Requires(pre):	/usr/sbin/usermod
-Requires(triggerpostun):	findutils
+Requires(postun):	findutils
 Requires:	perl-Config-Grammar
 Requires:	rc-scripts >= 0.4.1.23
 Requires:	rrdtool >= 1.2
@@ -207,7 +207,7 @@ find /var/lib/smokeping/rrd -type d -user root -group root -exec chown smokeping
 
 %files
 %defattr(644,root,root,755)
-%doc CHANGES CONTRIBUTORS COPYRIGHT README TODO doc/*.txt doc/examples
+%doc CHANGES CONTRIBUTORS COPYRIGHT README.md TODO doc/*.txt doc/examples
 %attr(755,root,root) %{_bindir}/smokeinfo
 %attr(755,root,root) %{_bindir}/smokeping
 %attr(755,root,root) %{_bindir}/tSmoke
@@ -215,6 +215,7 @@ find /var/lib/smokeping/rrd -type d -user root -group root -exec chown smokeping
 %exclude %{_cgi_bindir}/css
 %exclude %{_cgi_bindir}/js
 %exclude %{_datadir}/smokeping/smokeping.*cgi
+%{_mandir}/man1/smokeinfo.1*
 %{_mandir}/man1/smokeping.1*
 %{_mandir}/man1/smokeping.cgi.1*
 %{_mandir}/man1/tSmoke.1*

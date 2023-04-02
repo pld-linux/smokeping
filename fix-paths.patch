@@ -1,6 +1,6 @@
-diff -urN smokeping-2.7.3.org/bin/smokeinfo smokeping-2.7.3/bin/smokeinfo
---- smokeping-2.7.3.org/bin/smokeinfo	2018-04-13 14:13:05.000000000 +0200
-+++ smokeping-2.7.3/bin/smokeinfo	2019-03-15 09:59:38.301385321 +0100
+diff -ur smokeping-2.8.2.org/bin/smokeinfo smokeping-2.8.2/bin/smokeinfo
+--- smokeping-2.8.2.org/bin/smokeinfo	2021-08-10 12:00:33.000000000 +0200
++++ smokeping-2.8.2/bin/smokeinfo	2023-04-02 18:16:09.223051686 +0200
 @@ -2,8 +2,7 @@
  use strict;
  use warnings;
@@ -11,15 +11,15 @@ diff -urN smokeping-2.7.3.org/bin/smokeinfo smokeping-2.7.3/bin/smokeinfo
  
  use Smokeping::Info;
  use Getopt::Long 2.25 qw(:config no_ignore_case);
-diff -urN smokeping-2.7.3.org/bin/smokeping smokeping-2.7.3/bin/smokeping
---- smokeping-2.7.3.org/bin/smokeping	2018-04-13 14:13:05.000000000 +0200
-+++ smokeping-2.7.3/bin/smokeping	2019-03-15 09:59:38.301385321 +0100
+diff -ur smokeping-2.8.2.org/bin/smokeping smokeping-2.8.2/bin/smokeping
+--- smokeping-2.8.2.org/bin/smokeping	2021-08-13 08:11:39.000000000 +0200
++++ smokeping-2.8.2/bin/smokeping	2023-04-02 18:16:09.223051686 +0200
 @@ -4,13 +4,11 @@
  use strict;
  use warnings;
  
--use lib (split /:/, q{}); # PERL5LIB
 -use FindBin;
+-use lib (split /:/, q{}); # PERL5LIB
 -use lib "$FindBin::RealBin/../lib";use lib "$FindBin::RealBin/../thirdparty/lib/perl5"; # LIBDIR
 +use lib "/usr/share/smokeping";
  
@@ -30,33 +30,32 @@ diff -urN smokeping-2.7.3.org/bin/smokeping smokeping-2.7.3/bin/smokeping
  
  =head1 NAME
  
-diff -urN smokeping-2.7.3.org/bin/smokeping_cgi smokeping-2.7.3/bin/smokeping_cgi
---- smokeping-2.7.3.org/bin/smokeping_cgi	2018-04-13 14:13:05.000000000 +0200
-+++ smokeping-2.7.3/bin/smokeping_cgi	2019-03-15 09:59:38.304718754 +0100
+diff -ur smokeping-2.8.2.org/bin/smokeping_cgi smokeping-2.8.2/bin/smokeping_cgi
+--- smokeping-2.8.2.org/bin/smokeping_cgi	2021-08-13 08:11:39.000000000 +0200
++++ smokeping-2.8.2/bin/smokeping_cgi	2023-04-02 18:16:58.269718358 +0200
 @@ -4,9 +4,7 @@
  use strict;
  use warnings;
  
--use lib (split /:/, q{}); # PERL5LIB
 -use FindBin;
+-use lib (split /:/, q{}); # PERL5LIB
 -use lib "$FindBin::RealBin/../lib";use lib "$FindBin::RealBin/../thirdparty/lib/perl5"; # LIBDIR
 +use lib "/usr/share/smokeping";
  
  # don't bother with zombies
  $SIG{CHLD} = 'IGNORE';
-@@ -17,8 +15,7 @@
+@@ -17,7 +15,7 @@
  
  use CGI::Fast;
  
 -my $cfg = (shift @ARGV) || "$FindBin::Bin/../etc/config";
--
 +my $cfg = (shift @ARGV) || "/etc/smokeping/config";
  
+ 
  while (my $q = new CGI::Fast) {
-    Smokeping::cgi($cfg,$q);
-diff -urN smokeping-2.7.3.org/bin/tSmoke smokeping-2.7.3/bin/tSmoke
---- smokeping-2.7.3.org/bin/tSmoke	2018-04-13 14:13:05.000000000 +0200
-+++ smokeping-2.7.3/bin/tSmoke	2019-03-15 09:59:38.304718754 +0100
+diff -ur smokeping-2.8.2.org/bin/tSmoke smokeping-2.8.2/bin/tSmoke
+--- smokeping-2.8.2.org/bin/tSmoke	2021-08-13 08:11:39.000000000 +0200
++++ smokeping-2.8.2/bin/tSmoke	2023-04-02 18:16:09.223051686 +0200
 @@ -52,9 +52,7 @@
  #
  # Point the lib variables to your implementation
@@ -72,26 +71,14 @@ diff -urN smokeping-2.7.3.org/bin/tSmoke smokeping-2.7.3/bin/tSmoke
  use RRDs;
  
  # Point to your Smokeping config file
--my $cfgfile = "etc/config.dist";
-+my $cfgfile = "/etc/smokeping/config";
+-my $cfgfile = (shift @ARGV) || "$FindBin::Bin/../etc/config";
++my $cfgfile = (shift @ARGV) || "/etc/smokeping/config";
  
  # global variables
  my $cfg;
-diff -urN smokeping-2.7.3.org/doc/smokeping_install.pod smokeping-2.7.3/doc/smokeping_install.pod
---- smokeping-2.7.3.org/doc/smokeping_install.pod	2018-01-30 21:40:07.000000000 +0100
-+++ smokeping-2.7.3/doc/smokeping_install.pod	2019-03-15 09:59:38.304718754 +0100
-@@ -108,7 +108,7 @@
- 
- =head2 Configuration
- 
--Use the F<etc/config.dist> file as a template to create your own smokeping configuration file.
-+Use the F</etc/smokeping/config> file as a template to create your own smokeping configuration file.
- See L<smokeping_config> for details.
- 
- =over
-diff -urN smokeping-2.7.3.org/etc/basepage.html.dist smokeping-2.7.3/etc/basepage.html.dist
---- smokeping-2.7.3.org/etc/basepage.html.dist	2017-06-25 20:18:25.000000000 +0200
-+++ smokeping-2.7.3/etc/basepage.html.dist	2019-03-15 10:00:33.033019175 +0100
+diff -ur smokeping-2.8.2.org/etc/basepage.html.dist smokeping-2.8.2/etc/basepage.html.dist
+--- smokeping-2.8.2.org/etc/basepage.html.dist	2019-09-23 09:46:17.000000000 +0200
++++ smokeping-2.8.2/etc/basepage.html.dist	2023-04-02 18:16:09.226385019 +0200
 @@ -4,8 +4,8 @@
      <meta name="viewport" content="width=device-width, initial-scale=1">
      <META http-equiv="Refresh" content="<##step##>">
@@ -118,9 +105,9 @@ diff -urN smokeping-2.7.3.org/etc/basepage.html.dist smokeping-2.7.3/etc/basepag
  
  </body>
  </html>
-diff -urN smokeping-2.7.3.org/lib/Smokeping/Examples.pm smokeping-2.7.3/lib/Smokeping/Examples.pm
---- smokeping-2.7.3.org/lib/Smokeping/Examples.pm	2011-10-05 11:51:46.000000000 +0200
-+++ smokeping-2.7.3/lib/Smokeping/Examples.pm	2019-03-15 09:59:38.304718754 +0100
+diff -ur smokeping-2.8.2.org/lib/Smokeping/Examples.pm smokeping-2.8.2/lib/Smokeping/Examples.pm
+--- smokeping-2.8.2.org/lib/Smokeping/Examples.pm	2011-10-05 11:51:46.000000000 +0200
++++ smokeping-2.8.2/lib/Smokeping/Examples.pm	2023-04-02 18:16:42.016385025 +0200
 @@ -12,7 +12,7 @@
  This module generates L<smokeping_examples> and the example
  configuration files distributed with Smokeping. It is supposed to be
@@ -139,10 +126,10 @@ diff -urN smokeping-2.7.3.org/lib/Smokeping/Examples.pm smokeping-2.7.3/lib/Smok
  configuration template in the Smokeping distribution so that the example
  files are complete.
  
-diff -urN smokeping-2.7.3.org/lib/Smokeping.pm smokeping-2.7.3/lib/Smokeping.pm
---- smokeping-2.7.3.org/lib/Smokeping.pm	2018-12-20 11:24:44.000000000 +0100
-+++ smokeping-2.7.3/lib/Smokeping.pm	2019-03-15 09:59:38.304718754 +0100
-@@ -3620,7 +3620,7 @@
+diff -ur smokeping-2.8.2.org/lib/Smokeping.pm smokeping-2.8.2/lib/Smokeping.pm
+--- smokeping-2.8.2.org/lib/Smokeping.pm	2021-08-13 08:19:27.000000000 +0200
++++ smokeping-2.8.2/lib/Smokeping.pm	2023-04-02 18:16:09.226385019 +0200
+@@ -3871,7 +3871,7 @@
  
   *** Probes ***
   +FPing
